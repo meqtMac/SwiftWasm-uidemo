@@ -1,0 +1,60 @@
+//
+//  File.swift
+//  
+//
+//  Created by 蒋艺 on 2023/9/18.
+//
+
+import JavaScriptKit
+
+extension JSString {
+    @usableFromInline static let _self: JSString = "self"
+    @usableFromInline static let Gamepad: JSString = "Gamepad"
+    @usableFromInline static let GamepadButton: JSString = "GamepadButton"
+    @usableFromInline static let GamepadEvent: JSString = "GamepadEvent"
+    @usableFromInline static let GamepadHapticActuator: JSString = "GamepadHapticActuator"
+    @usableFromInline static let GamepadPose: JSString = "GamepadPose"
+    @usableFromInline static let GamepadTouch: JSString = "GamepadTouch"
+    @usableFromInline static let Navigator: JSString = "Navigator"
+    @usableFromInline static let Object: JSString = "Object"
+    @usableFromInline static let angularAcceleration: JSString = "angularAcceleration"
+    @usableFromInline static let angularVelocity: JSString = "angularVelocity"
+    @usableFromInline static let axes: JSString = "axes"
+    @usableFromInline static let buttons: JSString = "buttons"
+    @usableFromInline static let canPlayEffectType: JSString = "canPlayEffectType"
+    @usableFromInline static let connected: JSString = "connected"
+    @usableFromInline static let duration: JSString = "duration"
+    @usableFromInline static let gamepad: JSString = "gamepad"
+    @usableFromInline static let getGamepads: JSString = "getGamepads"
+    @usableFromInline static let hand: JSString = "hand"
+    @usableFromInline static let hapticActuators: JSString = "hapticActuators"
+    @usableFromInline static let hasOrientation: JSString = "hasOrientation"
+    @usableFromInline static let hasPosition: JSString = "hasPosition"
+    @usableFromInline static let id: JSString = "id"
+    @usableFromInline static let index: JSString = "index"
+    @usableFromInline static let linearAcceleration: JSString = "linearAcceleration"
+    @usableFromInline static let linearVelocity: JSString = "linearVelocity"
+    @usableFromInline static let mapping: JSString = "mapping"
+    @usableFromInline static let ongamepadconnected: JSString = "ongamepadconnected"
+    @usableFromInline static let ongamepaddisconnected: JSString = "ongamepaddisconnected"
+    @usableFromInline static let orientation: JSString = "orientation"
+    @usableFromInline static let playEffect: JSString = "playEffect"
+    @usableFromInline static let pose: JSString = "pose"
+    @usableFromInline static let position: JSString = "position"
+    @usableFromInline static let pressed: JSString = "pressed"
+    @usableFromInline static let pulse: JSString = "pulse"
+    @usableFromInline static let reset: JSString = "reset"
+    @usableFromInline static let startDelay: JSString = "startDelay"
+    @usableFromInline static let strongMagnitude: JSString = "strongMagnitude"
+    @usableFromInline static let surfaceDimensions: JSString = "surfaceDimensions"
+    @usableFromInline static let surfaceId: JSString = "surfaceId"
+    @usableFromInline static let timestamp: JSString = "timestamp"
+    @usableFromInline static let toString: JSString = "toString"
+    @usableFromInline static let touchEvents: JSString = "touchEvents"
+    @usableFromInline static let touchId: JSString = "touchId"
+    @usableFromInline static let touched: JSString = "touched"
+    @usableFromInline static let type: JSString = "type"
+    @usableFromInline static let value: JSString = "value"
+    @usableFromInline static let vibrationActuator: JSString = "vibrationActuator"
+    @usableFromInline static let weakMagnitude: JSString = "weakMagnitude"
+}
