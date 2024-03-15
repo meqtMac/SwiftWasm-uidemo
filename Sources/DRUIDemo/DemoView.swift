@@ -9,6 +9,7 @@ import Foundation
 import DOM
 import WebAPIBase
 import JavaScriptKit
+import DRUI
 
 class RectDRView: RectView {
     var userInteractEnabled: Bool = false
@@ -23,7 +24,7 @@ class RectDRView: RectView {
 
 class CapsuleDRView: CapsuleView {
     var userInteractEnabled: Bool = true
-    var frame: CGRect = .zero
+    var frame: CGRect = CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: 0, height: 0))
     
     var backgroundColor: JSColor = .yellow
     
@@ -32,7 +33,7 @@ class CapsuleDRView: CapsuleView {
     var hidden: Bool = false
     
     func touchBegin(with point: CGPoint) {
-//        globalThis.alert(message: "Volume Up")
+        globalThis.alert(message: "\(JSDate())")
     }
     
     func touchMove(with point: CGPoint) {
@@ -80,7 +81,7 @@ class DeviceLabelView: DRView {
 class ContentView: RectView {
     var userInteractEnabled: Bool = false
     
-    var frame: CGRect = .zero
+    var frame: CGRect = CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: 0, height: 0))
     
     var backgroundColor: DOM.JSColor = .rgba(0, 255, 0, 0.1)
     
@@ -204,10 +205,7 @@ class DeviceView: RectView {
             return view
         }()
         
-//        self.svipView.hidden = true
-//        self.adView.hidden = true
-        
-        self.subviews = [
+       self.subviews = [
                          self.titleView,
                          self.playList,
                          self.svipView,
@@ -302,16 +300,20 @@ class DemoView: RectView {
     var label: DeviceLabelView
     
     init(frame: CGRect, backgroundColor: JSColor) {
+        var frame = frame
+        frame.size = currentDevice.size
         self.frame = frame
         self.backgroundColor = backgroundColor
         
-       let deviceView = DeviceView(frame: CGRect(origin: CGPoint(x: 0, y: 100), size: currentDevice.size), backgroundColor: .black)
+        let deviceView = DeviceView(frame: CGRect(origin: CGPoint(x: 0, y: 100), size: currentDevice.size), backgroundColor: .black)
         self.deviceView = deviceView
         
         let label = DeviceLabelView()
         self.label = label
         
         self.subviews = [self.deviceView, label]
+        
+//        self.size = currentDevice.size
     }
     
     func layoutSubviews() {

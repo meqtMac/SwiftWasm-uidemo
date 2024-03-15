@@ -8,30 +8,16 @@
 import Foundation
 
 
-extension CGRect {
-    static var zero: CGRect {
-        return CGRect(origin: .zero, size: .zero)
-    }
-}
-
-extension CGPoint {
+public extension CGPoint {
      static var zero: Self {
          return CGPoint(x: 0, y: 0)
     }
 }
 
-extension CGSize {
-     static var zero: Self {
-         return Self(width: 0, height: 0)
-    }
-}
+//extension CGRect {
+//}
 
-
-import Foundation
-
-
-
-extension DRView {
+public extension DRView {
     var left: CGFloat {
         get {
             frame.left
@@ -190,16 +176,7 @@ extension CGRect {
         }
     }
     
-//    var center: CGPoint {
-//        get {
-//            CGPoint(x: centerX, y: centerY)
-//        }
-//        set {
-//            centerX = newValue.x
-//            centerY = newValue.y
-//        }
-//    }
-    var centerX: CGFloat {
+   var centerX: CGFloat {
         get {
             self.origin.x + self.width / 2
         }

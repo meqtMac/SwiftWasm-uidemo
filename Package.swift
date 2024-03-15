@@ -4,17 +4,21 @@
 import PackageDescription
 
 let package = Package(
-    name: "WebAPIKit",
+    name: "swiftwasm-uidemo",
     platforms: [
         .macOS(.v10_15),
         .iOS(.v13),
         .watchOS(.v6),
         .tvOS(.v13)
-],
+    ],
     products: [
         .executable(
-            name: "WebAPIKitDemo",
-            targets: ["WebAPIKitDemo"]
+            name: "DRUIDemo",
+            targets: ["DRUIDemo"]
+        ),
+        .library(
+            name: "DRUI",
+            targets: ["DRUI"]
         ),
         .library(
             name: "WebAPIBase",
@@ -28,10 +32,6 @@ let package = Package(
             name: "WebSockets",
             targets: ["WebSockets"]
         ),
-//        .library(
-//            name: "WebAudio",
-//            targets: ["WebAudio"]
-//        ),
         .library(
             name: "WebAnimations",
             targets: ["WebAnimations"]
@@ -76,8 +76,12 @@ let package = Package(
     ],
     targets: [
         .executableTarget(
-            name: "WebAPIKitDemo",
-            dependencies: ["DOM", "WebGL2", "WebSockets"]
+            name: "DRUIDemo",
+            dependencies: ["DOM", "DRUI"]
+        ),
+        .target(
+            name: "DRUI",
+            dependencies: ["DOM", "WebAPIBase", "JavaScriptKit"]
         ),
         .target(
             name: "WebAPIBase",
@@ -91,10 +95,6 @@ let package = Package(
             name: "WebSockets",
             dependencies: ["DOM", "WebAPIBase", "ECMAScript"]
         ),
-//        .target(
-//            name: "WebAudio",
-//            dependencies: ["DOM", "WebAPIBase", "ECMAScript"]
-//        ),
         .target(
             name: "WebAnimations",
             dependencies: ["DOM", "WebAPIBase", "ECMAScript"]
@@ -127,7 +127,7 @@ let package = Package(
             name: "FileSystem",
             dependencies: ["DOM", "WebAPIBase", "ECMAScript"]
         ),
-        .target(
+       .target(
             name: "ECMAScript",
             dependencies: [
                 "JavaScriptKit",
