@@ -14,9 +14,6 @@ public extension CGPoint {
     }
 }
 
-//extension CGRect {
-//}
-
 public extension DRView {
     var left: CGFloat {
         get {

@@ -7,7 +7,6 @@
 
 import Foundation
 import DOM
-//import WebAPIBase
 
 struct Canvas {
     internal let element: HTMLCanvasElement

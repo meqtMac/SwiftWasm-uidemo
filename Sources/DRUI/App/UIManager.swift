@@ -10,7 +10,7 @@ import DOM
 
 fileprivate var uiManager: UIManager?
 
-class UIManager: UIManagerInterface {
+public class UIManager: UIManagerInterface {
     private let drawingManager: DrawingManager
     private let eventManager: EventManager
     private init(view: DRView) {
@@ -22,11 +22,11 @@ class UIManager: UIManagerInterface {
         self.eventManager = EventManager(canvas: canvas, rootView: rootView)
     }
     
-    func invalidate() {
+    public func invalidate() {
         drawingManager.setInvalidate()
     }
     
-    static var main: UIManagerInterface {
+    public static var main: UIManagerInterface {
         let impl = UIManagerImplementation(manager: uiManager)
         return impl
     }
@@ -36,7 +36,7 @@ class UIManager: UIManagerInterface {
     }
 }
 
-protocol UIManagerInterface {
+public protocol UIManagerInterface {
     func invalidate()
 }
 
