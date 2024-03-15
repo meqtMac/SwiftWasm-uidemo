@@ -2,8 +2,6 @@ import Foundation
 import DRUI
 
 
-let currentDevice: Device = .iPhone15Pro
-
 @main
 struct DemoApp: SwiftWasmApp {
     var view: DRView {

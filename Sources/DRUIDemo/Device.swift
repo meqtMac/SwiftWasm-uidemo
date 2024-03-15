@@ -36,11 +36,11 @@ enum Device {
         case .iPhone15Pro:
             return DeviceInfo(name: "iPhone 15 Pro", size: CGSize(width: 393, height: 852), statusBarHeight: 54, safeAreaBottom: 34, uiSizeClass: .regular)
         case .iPhone15ProMax:
-            return DeviceInfo(name: "iPhone 15 Pro Max", size: CGSize(width: 428, height: 926), statusBarHeight: 54, safeAreaBottom: 34, uiSizeClass: .regular)
+            return DeviceInfo(name: "iPhone 15 Pro Max", size: CGSize(width: 430, height: 932), statusBarHeight: 54, safeAreaBottom: 34, uiSizeClass: .regular)
         case .iPadMini6:
-            return DeviceInfo(name: "iPad Mini 6", size: CGSize(width: 744, height: 1080), statusBarHeight: 20, safeAreaBottom: 0, uiSizeClass: .large)
+            return DeviceInfo(name: "iPad Mini 6", size: CGSize(width: 744, height: 1133), statusBarHeight: 20, safeAreaBottom: 0, uiSizeClass: .large)
         case .iPadMini6_Horizontal:
-            return DeviceInfo(name: "iPad Mini 6", size: CGSize(width: 1080, height: 744), statusBarHeight: 20, safeAreaBottom: 0, uiSizeClass: .huge)
+            return DeviceInfo(name: "iPad Mini 6", size: CGSize(width: 1133, height: 744), statusBarHeight: 20, safeAreaBottom: 0, uiSizeClass: .huge)
         case .iPadPro11inch:
             return DeviceInfo(name: "iPad Pro 11 inch", size: CGSize(width: 834, height: 1194), statusBarHeight: 20, safeAreaBottom: 0, uiSizeClass: .huge)
         case .iPadPro11inch_Horizontal:
