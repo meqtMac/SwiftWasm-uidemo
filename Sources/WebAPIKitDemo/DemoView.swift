@@ -7,7 +7,11 @@
 
 import Foundation
 import DOM
+import WebAPIBase
+import JavaScriptKit
+
 class RectDRView: RectView {
+    var userInteractEnabled: Bool = false
     var hidden: Bool = false
     
     var frame: CGRect = .init(origin: .init(x: 0, y: 0), size: .init(width: 0, height: 0))
@@ -18,7 +22,7 @@ class RectDRView: RectView {
 }
 
 class CapsuleDRView: CapsuleView {
-    
+    var userInteractEnabled: Bool = true
     var frame: CGRect = .zero
     
     var backgroundColor: JSColor = .yellow
@@ -27,9 +31,24 @@ class CapsuleDRView: CapsuleView {
     
     var hidden: Bool = false
     
+    func touchBegin(with point: CGPoint) {
+//        globalThis.alert(message: "Volume Up")
+    }
+    
+    func touchMove(with point: CGPoint) {
+        print("")
+    }
+    
+    func touchEnd(with point: CGPoint) {
+        globalThis.alert(message: "Volume Up")
+    }
+    
+    
 }
 
 class DeviceLabelView: DRView {
+    var userInteractEnabled: Bool = false
+    
     var hidden: Bool = false
     
     var frame: CGRect
@@ -59,6 +78,8 @@ class DeviceLabelView: DRView {
 }
 
 class ContentView: RectView {
+    var userInteractEnabled: Bool = false
+    
     var frame: CGRect = .zero
     
     var backgroundColor: DOM.JSColor = .rgba(0, 255, 0, 0.1)
@@ -96,7 +117,6 @@ class ContentView: RectView {
     func layoutSubviews() {
         let topHeight: CGFloat = 80
         let centerHeight: CGFloat = 101
-        let bottomHeight: CGFloat = 48
         
         let adaptiveWidth: CGFloat
         let padding: CGFloat
@@ -138,8 +158,8 @@ class ContentView: RectView {
 }
 
 class DeviceView: RectView {
+    var userInteractEnabled: Bool = false
     var hidden: Bool = false
-    
     var frame: CGRect
     var backgroundColor: JSColor
     var subviews: [DRView]
@@ -149,8 +169,6 @@ class DeviceView: RectView {
     var svipView: RectView
     var adView: RectView
     var contentView: ContentView
-    
-//    var contentView:
     
     init(frame: CGRect, backgroundColor: JSColor) {
         self.frame = frame
@@ -186,6 +204,9 @@ class DeviceView: RectView {
             return view
         }()
         
+//        self.svipView.hidden = true
+//        self.adView.hidden = true
+        
         self.subviews = [
                          self.titleView,
                          self.playList,
@@ -210,10 +231,20 @@ class DeviceView: RectView {
         self.svipView.size = svipSize()
         self.svipView.bottom = self.adView.top - 16
         self.svipView.centerX = self.width / 2
+        let contentHeight: CGFloat
+        if (!self.svipView.hidden) {
+            contentHeight = svipView.top - titleView.bottom
+        } else if (!self.adView.hidden ) {
+            contentHeight = adView.top - titleView.bottom
+        } else {
+            contentHeight =  height - titleView.bottom - playListHeight
+        }
         
-        self.contentView.size = CGSize(width: width, height: svipView.top - titleView.bottom)
+        self.contentView.size = CGSize(width: width, height: max(contentHeight, 300))
         self.contentView.top = titleView.bottom
         self.contentView.centerX = self.width / 2
+        
+        self.svipView.top = self.contentView.bottom
     }
     
     private func adSize() -> CGSize {
@@ -244,7 +275,7 @@ class DeviceView: RectView {
     
     private func svipSize() -> CGSize {
         // 69 or 48
-        let height: CGFloat = 69
+        let height: CGFloat = 48
         let padding: CGFloat
         switch currentDevice.uiSizeClass {
         case .regular:
@@ -261,8 +292,8 @@ class DeviceView: RectView {
 }
 
 class DemoView: RectView {
+    var userInteractEnabled: Bool = false
     var hidden: Bool = false
-    
     var frame: CGRect
     var backgroundColor: JSColor
     var subviews: [DRView]

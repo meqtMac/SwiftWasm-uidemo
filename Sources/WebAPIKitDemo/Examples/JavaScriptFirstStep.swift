@@ -25,24 +25,22 @@ struct FirstStep: HTMDSL {
                     }
                 }
             }
-//            parent.removeChilds()
-//            let table = Table {
-//                Caption {
-//                    "Data about the planets of our solar system (Planetary facts taken from"
-//                    A (href: "https://nssdc.gsfc.nasa.gov/planetary/factsheet/") {
-//                        "Nasa's Planetary Fact Sheet - Metric"
-//                    }
-//                    ")"
-//                }
-//                ColGroup {
-//                    Col(span: 2)
-//                    Col(style: "border: 2px solid black")
-//                    Col(span: 9)
-//                }
-//                Self.headers
-//                Self.data
-//            }
-//            parent.appendChild(node: table.element)
+            parent.removeChilds()
+            let table = Table {
+                Caption {
+                    "Data about the planets of our solar system (Planetary facts taken from"
+                    A (href: "https://nssdc.gsfc.nasa.gov/planetary/factsheet/") {
+                        "Nasa's Planetary Fact Sheet - Metric"
+                    }
+                    ")"
+                }
+                ColGroup {
+                    Col(span: 2)
+                    Col(style: "border: 2px solid black")
+                    Col(span: 9)
+                }
+            }
+            parent.appendChild(node: table.element)
         }.element
     }
 

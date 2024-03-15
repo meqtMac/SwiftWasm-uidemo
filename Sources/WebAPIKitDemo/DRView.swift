@@ -7,42 +7,60 @@
 
 import DOM
 import Foundation
+protocol InteractiveView {
+    var userInteractEnabled: Bool { get set }
+    func touchBegin(with point: CGPoint)
+    func touchMove(with point: CGPoint)
+    func touchEnd(with point: CGPoint)
+}
 
-protocol DRView {
+extension InteractiveView {
+    func touchBegin(with point: CGPoint) {
+        
+    }
+    
+    func touchMove(with point: CGPoint) {
+        
+    }
+    
+    func touchEnd(with point: CGPoint) {
+        
+    }
+}
+
+protocol DRView: InteractiveView {
     var frame: CGRect { get set }
     var backgroundColor: JSColor { get set }
     func draw(on context: CanvasRenderingContext2D)
     func layoutSubviews()
     var subviews: [DRView] { get set }
     var hidden: Bool { get set }
-    
-//    var userInteractionEnabled: Bool { get set } // = true
-//    var onClick: ((CGPoint) -> Void) { get set }
-//    func mouseDown(point: CGPoint)
-//    func mouseMove(point: CGPoint)
-//    func mouseUp(point: CGPoint)
-    
 }
 
 
+typealias ViewWithOffset = (InteractiveView?, CGPoint)
+
 extension DRView {
-    var userInteractionEnabled: Bool {
-        false
+    
+    func responderSubView(for point: CGPoint) -> ViewWithOffset {
+        for view in subviews.reversed() {
+            if !view.hidden && view.userInteractEnabled && view.isPointInView(point: point) {
+                return (view, .zero)
+            }
+            if !view.hidden {
+                let (subView, offset) = view.responderSubView(for: CGPoint(x: point.x - view.left, y: point.y - view.top))
+                if let subView {
+                    return (subView, CGPoint(x: offset.x + view.left, y: offset.y + view.top) )
+                }
+            }
+        }
+        return (nil, .zero)
     }
     
-    func mouseDown(point: CGPoint) {
-        //
+    @usableFromInline
+    func isPointInView(point: CGPoint) -> Bool {
+        return frame.left <= point.x && frame.right >= point.x && frame.top <= point.y && frame.bottom >= point.y
     }
-    
-    func mouseMove(point: CGPoint) {
-        //
-    }
-    
-    func mouseUp(point: CGPoint) {
-        //
-    }
- 
- 
     
     func draw(on context: CanvasRenderingContext2D) {
         // Default do nothing
@@ -74,12 +92,10 @@ extension DRView {
 
 
 class RootView: DRView {
+    var userInteractEnabled: Bool = false
     var hidden: Bool = false
-    
     var frame: CGRect
-    
     var backgroundColor: DOM.JSColor
-    
     var subviews: [DRView]
     
     init(frame: CGRect, subviews: [DRView]) {
@@ -95,6 +111,9 @@ class RootView: DRView {
     
    
     func draw(on context: CanvasRenderingContext2D) {
+        context.imageSmoothingEnabled = false
+        self.frame = CGRect(origin: .zero, size: CGSize(width: CGFloat(context.canvas.width), height: CGFloat(context.canvas.height)))
+        
         context.clear(rect: frame)
         context.save()
         context.setFillStyle(backgroundColor)
@@ -162,7 +181,7 @@ extension CapsuleView {
 //        // You can access the event properties like event.x, event.y, and event.type
 //    }
 //}
-protocol InteractiveView {
+//protocol InteractiveView {
    
 //    // Implement the handleMouseEvent method
 //    func handleMouseEvent(event: MouseEvent) {
@@ -173,7 +192,7 @@ protocol InteractiveView {
 //        // Handle the mouse event here
 //        // You can access the event properties like event.x, event.y, and event.type
 //    }
-}
+//}
 
 //extension DRView: InteractiveView {
 //    var u
