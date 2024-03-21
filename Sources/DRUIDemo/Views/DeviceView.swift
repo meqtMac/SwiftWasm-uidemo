@@ -33,6 +33,7 @@ class DeviceViewModel: ObservableObject {
 }
 
 class DeviceView: RectView {
+    private var cancellables = Set<AnyCancellable>()
     let viewModel: DeviceViewModel
     
     var userInteractEnabled: Bool = false
@@ -96,23 +97,21 @@ class DeviceView: RectView {
             .sink { [weak self] show in
                 self?.playList.hidden = !show
             }
-        //     .observe { [weak self] show in
-        //     self?.playList.hidden = !show
-        // }
-        
+            .store(in: &cancellables)
+       
         self.viewModel
             .$showAd
-            .observe { [weak self] show in
+            .sink { [weak self] show in
                 self?.adView.hidden = !show
             }
+            .store(in: &cancellables)
         
         self.viewModel
             .$showSVIP
-            .observe { [weak self] show in
+            .sink { [weak self] show in
                 self?.svipView.hidden = !show
             }
-        
-        
+            .store(in: &cancellables)
     }
     
     func layoutSubviews() {
