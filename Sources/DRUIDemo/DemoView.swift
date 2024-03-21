@@ -10,6 +10,7 @@ import DOM
 import WebAPIBase
 import JavaScriptKit
 import DRUI
+import OpenCombineShim
 
 
 
@@ -19,6 +20,7 @@ class DemoView: RectView {
     var frame: CGRect
     var backgroundColor: JSColor
     var subviews: [DRView]
+    private var cancellables = Set<AnyCancellable>()
     
     let viewModel = DeviceViewModel()
     
@@ -30,6 +32,12 @@ class DemoView: RectView {
     init(frame: CGRect, backgroundColor: JSColor) {
         self.frame = frame
         self.backgroundColor = backgroundColor
+        viewModel
+            .objectWillChange
+            .sink { _ in
+                UIManager.main.invalidate()
+            }
+            .store(in: &cancellables)
         
         let deviceView = DeviceView(frame: CGRect(origin: CGPoint(x: 0, y: 100), size: viewModel.device.size), backgroundColor: .black, viewModel: viewModel)
         self.deviceView = deviceView

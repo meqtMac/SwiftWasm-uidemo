@@ -9,21 +9,26 @@ import Foundation
 import DOM
 import DRUI
 
-class DeviceViewModel {
+import OpenCombineShim
+
+public typealias ObservableObject = OpenCombineShim.ObservableObject
+public typealias Published = OpenCombineShim.Published
+
+class DeviceViewModel: ObservableObject {
     
-    @VMObservable
+    @Published
     var device: Device = .iPhone15ProMax
     
-    @VMObservable
+    @Published
     var showPlayList: Bool = true
     
-    @VMObservable
+    @Published
     var showAd: Bool = true
     
-    @VMObservable
+    @Published
     var showPr: Bool = false
     
-    @VMObservable
+    @Published
     var showSVIP: Bool = true
 }
 
@@ -88,9 +93,12 @@ class DeviceView: RectView {
         
         self.viewModel
             .$showPlayList
-            .observe { [weak self] show in
-            self?.playList.hidden = !show
-        }
+            .sink { [weak self] show in
+                self?.playList.hidden = !show
+            }
+        //     .observe { [weak self] show in
+        //     self?.playList.hidden = !show
+        // }
         
         self.viewModel
             .$showAd

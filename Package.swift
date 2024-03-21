@@ -71,13 +71,29 @@ let package = Package(
             from: "0.18.0"
         ),
         .package(
+            url: "https://github.com/OpenCombine/OpenCombine.git",
+            from: "0.14.0"
+        ),
+        .package(
+            url: "https://github.com/swiftwasm/OpenCombineJS.git",
+            from: "0.2.0"
+        ),
+        .package(
             url: "https://github.com/swiftwasm/carton",
-            from: "1.0.0"),
+            from: "1.0.0"
+        ),
     ],
     targets: [
         .executableTarget(
             name: "DRUIDemo",
-            dependencies: ["DOM", "DRUI"]
+            dependencies: [
+                "DOM", 
+                "DRUI",
+                .product(
+                    name: "OpenCombineShim",
+                    package: "OpenCombine"
+                ),
+            ]
         ),
         .target(
             name: "DRUI",

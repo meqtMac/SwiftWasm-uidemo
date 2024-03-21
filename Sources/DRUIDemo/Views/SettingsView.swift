@@ -8,9 +8,11 @@
 import Foundation
 import DOM
 import DRUI
+import OpenCombineShim
 
 class SettingsView: DRView {
     private let viewModel: DeviceViewModel
+    private var cancellables = Set<AnyCancellable>()
     var userInteractEnabled: Bool = false
     
     var frame: CGRect = CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: 0, height: 0))
@@ -43,24 +45,28 @@ class SettingsView: DRView {
         self.subviews = views
         self.hidden = false
         viewModel.$showPlayList
-            .observe { show in
+            .sink { show in
                 views[0].text = "playlist: \(show ? "show" : "hidden")"
             }
+            .store(in: &cancellables)
         
         viewModel.$showPr
-            .observe { show in
+            .sink { show in
                 views[1].text = "pr: \(show ? "show" : "hidden")"
             }
+            .store(in: &cancellables)
         
         viewModel.$showSVIP
-            .observe { show in
+            .sink { show in
                 views[2].text = "svip: \(show ? "show" : "hidden")"
             }
+            .store(in: &cancellables)
         
         viewModel.$showAd
-            .observe { show in
+            .sink { show in
                 views[3].text = "ad: \(show ? "show" : "hidden")"
             }
+            .store(in: &cancellables)
         
     }
     
