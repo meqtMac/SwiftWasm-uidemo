@@ -82,7 +82,6 @@ let package = Package(
             url: "https://github.com/swiftwasm/carton",
             from: "1.0.0"
         ),
-        .package(name: "RefCount", path: "../swift-rc")
     ],
     targets: [
         .executableTarget(
@@ -94,15 +93,13 @@ let package = Package(
                     name: "OpenCombineShim",
                     package: "OpenCombine"
                 ),
-                .product(name: "RefCount", package: "RefCount")
             ]
         ),
         .target(
             name: "DRUI",
             dependencies: ["DOM", 
                            "WebGL2",
-//                           "RefCount"
-                           .product(name: "RefCount", package: "RefCount")
+                           "RefCount"
                           ]
         ),
         .target(
@@ -113,6 +110,7 @@ let package = Package(
             name: "DOM",
             dependencies: ["WebAPIBase", "ECMAScript"]
         ),
+        .target(name: "RefCount"),
         .target(
             name: "WebSockets",
             dependencies: ["DOM", "WebAPIBase", "ECMAScript"]
