@@ -10,27 +10,34 @@ import DOM
 import DRUI
 import OpenCombineShim
 
-class SettingsView: DRView {
-    private let viewModel: DeviceViewModel
+struct SettingsView: DRView {
+    
     private var cancellables = Set<AnyCancellable>()
     var userInteractEnabled: Bool = false
     
     var frame: CGRect = CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: 0, height: 0))
     
-    var backgroundColor: JSColor = .rgba(0, 255, 0, 0.1)
+    var backgroundColor: Color32 = .rgba(0, 255, 0, 26)
     
-    var subviews: [DRView] = []
+    var subviews: [DRViewRef] {
+        get { views.map { $0 } }
+        set {
+            fatalError("over write addSubView")
+        }
+    }
+    
+    var views: [Rc<SettingCell>] = []
     
     var hidden: Bool = false
     
-    init(viewModel: DeviceViewModel) {
-        self.viewModel = viewModel
+    init() {
         self.userInteractEnabled = false
         self.frame = CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: 0, height: 0))
         self.backgroundColor = .rgba(0, 0, 0, 0)
-        let views: [SettingCell] = [
+        views = [
             SettingCell(text: "playlist", backgroundColor: .blue) { [weak viewModel] in
                 viewModel?.showPlayList.toggle()
+                
             },
             SettingCell(text: "pr", backgroundColor: .green) { [weak viewModel] in
                 viewModel?.showPr.toggle()
@@ -41,62 +48,66 @@ class SettingsView: DRView {
             SettingCell(text: "ad", backgroundColor: .red) { [weak viewModel] in
                 viewModel?.showAd.toggle()
             },
-        ]
-        self.subviews = views
+        ].map {
+            Rc(wrappedValue: $0)
+        }
+        
+        var views = self.views
         self.hidden = false
         viewModel.$showPlayList
             .sink { show in
-                views[0].text = "playlist: \(show ? "show" : "hidden")"
+                views[0].wrappedValue.text = "playlist: \(show ? "show" : "hidden")"
+                console.log(data: "toggle playlist")
             }
             .store(in: &cancellables)
         
         viewModel.$showPr
             .sink { show in
-                views[1].text = "pr: \(show ? "show" : "hidden")"
+                views[1].wrappedValue.text = "pr: \(show ? "show" : "hidden")"
             }
             .store(in: &cancellables)
         
         viewModel.$showSVIP
             .sink { show in
-                views[2].text = "svip: \(show ? "show" : "hidden")"
+                views[2].wrappedValue.text = "svip: \(show ? "show" : "hidden")"
             }
             .store(in: &cancellables)
         
         viewModel.$showAd
             .sink { show in
-                views[3].text = "ad: \(show ? "show" : "hidden")"
+                views[3].wrappedValue.text = "ad: \(show ? "show" : "hidden")"
             }
             .store(in: &cancellables)
         
     }
     
-    func layoutSubviews() {
-        
+    mutating func layoutSubviews() {
         subviews.indices
             .forEach { index in
-                subviews[index].size = CGSize(width: self.width, height: 50)
-                subviews[index].left = 0
-                subviews[index].top = 50 * CGFloat(index)
+                views[index].wrappedValue.size = CGSize(width: self.width, height: 50)
+                views[index].wrappedValue.left = 0
+                views[index].wrappedValue.top = 50 * CGFloat(index)
             }
     }
     
     
 }
 
-class SettingCell: DRView {
+struct SettingCell: DRView {
     var text: String
     var userInteractEnabled: Bool = false
     var frame: CGRect = CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: 0, height: 0))
-    var backgroundColor: JSColor = .rgba(0, 0, 0, 0)
-    var subviews: [DRView] = []
+    var backgroundColor: Color32 = .rgba(0, 0, 0, 0)
+    var subviews: [DRViewRef] = []
+    @Rc
     var button: Button
     
     var hidden: Bool = false
  
-    init(text: String, backgroundColor: JSColor, onClick: @escaping () -> Void) {
+    init(text: String, backgroundColor: Color32, onClick: @escaping () -> Void) {
         self.text = text
         self.button = Button(color: backgroundColor, onClick: onClick)
-        subviews.append(self.button)
+        subviews.append($button)
     }
     
     func draw(on context: CanvasRenderingContext2D) {
@@ -111,7 +122,7 @@ class SettingCell: DRView {
         context.restore()
     }
     
-    func layoutSubviews() {
+    mutating func layoutSubviews() {
         button.size = CGSize(width: 50, height: 50)
         button.right = self.width
         button.top = 0

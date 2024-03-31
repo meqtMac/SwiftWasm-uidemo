@@ -10,48 +10,54 @@ import DOM
 import WebAPIBase
 import JavaScriptKit
 import DRUI
+import RefCount
 
-class ContentView: RectView {
+struct ContentView: RectView {
     private let viewModel: DeviceViewModel
     var userInteractEnabled: Bool = false
     
     var frame: CGRect = CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: 0, height: 0))
     
-    var backgroundColor: DOM.JSColor = .rgba(0, 255, 0, 0.1)
+    var backgroundColor: Color32 = .rgba(0, 255, 0, UInt8(0.1 * 255))
     
-    var subviews: [DRView] = []
+    var subviews: [DRViewRef] = []
     
     var hidden: Bool = false
     
-    var topContainer: RectView
-    var centerContainer: RectView
-    var bottomView: CapsuleView
+    @Rc
+    var topContainer: RectDRView
+    
+    @Rc
+    var centerContainer: RectDRView
+    
+    @Rc
+    var bottomView: CapsuleDRView
     
     init(viewModel: DeviceViewModel) {
         self.viewModel = viewModel
         
         self.topContainer = {
-            let view = RectDRView()
-            view.backgroundColor = .rgba(255, 255, 255, 0.4)
+            var view = RectDRView()
+            view.backgroundColor = .rgba(255, 255, 255,  UInt8(0.4 * 255))
             return view
         }()
         
         self.centerContainer = {
-            let view = RectDRView()
-            view.backgroundColor = .rgba(255, 255, 255, 0.4)
+            var view = RectDRView()
+            view.backgroundColor = .rgba(255, 255, 255, UInt8(0.4 * 255))
             return view
         }()
         
         self.bottomView = {
-            let view = CapsuleDRView()
-             view.backgroundColor = .rgba(255, 255, 255, 0.4)
+            var view = CapsuleDRView()
+             view.backgroundColor = .rgba(255, 255, 255, UInt8(0.4 * 255))
             return view
         }()
         
-        self.subviews = [topContainer, centerContainer, bottomView ]
+        self.subviews = [self.$topContainer, self.$centerContainer, self.$bottomView ]
     }
     
-    func layoutSubviews() {
+    mutating func layoutSubviews() {
         let topHeight: CGFloat = 80
         let centerHeight: CGFloat = 101
         

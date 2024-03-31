@@ -1,67 +1,124 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by 蒋艺 on 2024/3/15.
 //
 
-//import Foundation
 import DOM
 import JavaScriptKit
 import WebAPIBase
+import RefCount
 
-internal class DrawingManager {
-    private var invalidate: Bool = true
-    private let canvas: Canvas
-    private let rootView: RootView
+internal struct DrawingManager {
+    private(set) var invalidate: Bool = true
     
-    private func draw() {
+    @Rc
+    private var canvas: Canvas
+    
+    @Rc
+    private var rootView: RootView
+    
+    @Rc
+    var timer: Int32? = nil
+ 
+    
+    mutating func draw() {
         rootView.draw(on: canvas.context)
+        invalidate = false
     }
     
-    init(canvas: Canvas, rootView: RootView) {
-        self.canvas = canvas
-        self.rootView = rootView
-        self.start()
+    init(canvas: Rc<Canvas>, rootView: Rc<RootView>) {
+        _canvas = canvas
+        _rootView = rootView
         
-        globalThis.addEventListener(type: "resize") { event in
+        globalThis.addEventListener(type: "resize") { [canvas] event in
             print("resized")
-            canvas.element.width = UInt32(globalThis.innerWidth)
-            canvas.element.height = UInt32(globalThis.innerHeight)
+            canvas.wrappedValue.element.width = UInt32(globalThis.innerWidth)
+            canvas.wrappedValue.element.height = UInt32(globalThis.innerHeight)
+            var manager = UIManager.main
+            manager.invalidate()
         }
     }
     
-    private var timer: Int32?
-    private func start() {
-        guard timer == nil else { return }
-        let this = globalThis.jsObject
-        print("\(this) \(JSDate())")
-        
-        self.timer = this["setInterval"].jsValue.function!(this: this, arguments: [
-            _toJSValue(tickFn), _toJSValue(16)
-        ]).fromJSValue()!
-    }
+    //    @Box
+    //    private var timer: Int32?
+    //
+    //    private consuming func start() -> Self {
+    //        guard timer == nil else { return self }
+    //        let this = globalThis.jsObject
+    //        print("\(this) \(JSDate())")
     
-    private lazy var tickFn = JSClosure { [self] _ in
-        if (self.invalidate) {
-            self.draw()
-        }
-        return .undefined
-    }
+    //        @Rc
+    //        var painter: DrawingManager; _painter = Rc(wrappedValue: self)
     
-    private func stop() {
-        guard let timer else { return }
-        globalThis.clearInterval(id: timer)
-        self.timer = nil
-    }
+    //        lazy var tickFn = JSClosure { [self] _ in
+    //            if (self.invalidate) {
+    //                self.draw()
+    //            }
+    //            return .undefined
+    //        }
     
-    deinit {
-        stop()
-    }
+    
+    //        self.timer = this["setInterval"].jsValue.function!(this: this, arguments: [
+    //            _toJSValue(tickFn), _toJSValue(16)
+    //        ]).fromJSValue()!
+    //    }
+    
+    
+    //    private func stop() {
+    //        guard let timer else { return }
+    //        globalThis.clearInterval(id: timer)
+    //        self.timer = nil
+    //    }
+    //
+    //    deinit {
+    //        stop()
+    //    }
 }
 
 extension DrawingManager {
-    func setInvalidate() {
+    mutating func setInvalidate() {
         invalidate = true
     }
+    
+//    mutating func
+}
+
+extension Rc where Value == DrawingManager {
+    
+    
+    mutating func start() {
+        
+        guard wrappedValue.timer == nil else {
+            return
+        }
+        let this = globalThis.jsObject
+        print("\(this) \(JSDate())")
+        
+        @Weak
+        var weakref: Value?; _weakref = self.weak
+        console.log(data: "drawing start")
+        lazy var tickFn = JSClosure { _ in
+           if weakref?.invalidate ?? false  {
+               console.log(data: "drawing loop")
+                weakref?.draw()
+            }
+            return .undefined
+        }
+        
+        wrappedValue.timer = this["setInterval"].jsValue.function!(this: this, arguments: [
+            _toJSValue(tickFn), _toJSValue(16)
+        ]).fromJSValue()!
+        
+    }
+    
+    
+    mutating func stop() {
+        if wrappedValue.timer != nil {
+            globalThis.clearInterval(id: wrappedValue.timer)
+        }
+        wrappedValue.timer = nil
+    }
+    
 }

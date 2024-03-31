@@ -5,50 +5,54 @@
 //  Created by 蒋艺 on 2024/3/15.
 //
 
-//import Foundation
 import DOM
+import RefCount
 
-fileprivate var uiManager: UIManager?
-
-public class UIManager: UIManagerInterface {
-    private let drawingManager: DrawingManager
-    private let eventManager: EventManager
+public struct UIManager: UIManagerInterface {
+    @Rc
+    var drawingManager: DrawingManager
+    
+    @Rc
+    var eventManager: EventManager
+    
+    
     private init(view: DRView) {
-        let canvas = Canvas(width: UInt32(globalThis.innerWidth), height: UInt32(globalThis.innerHeight))
+        @Rc
+        var canvas = Canvas(width: UInt32(globalThis.innerWidth), height: UInt32(globalThis.innerHeight))
         _ = globalThis.document.body?.appendChild(node: canvas.element)
- 
-        let rootView = RootView.rootView(on: canvas, view: view)
-        self.drawingManager = DrawingManager(canvas: canvas, rootView: rootView)
-        self.eventManager = EventManager(canvas: canvas, rootView: rootView)
+        
+        @Rc
+        var rootView = RootView.rootView(on: canvas, view: view)
+        
+        _drawingManager = Rc(wrappedValue: DrawingManager(canvas: $canvas, rootView: $rootView))
+        _eventManager = Rc(wrappedValue: EventManager(canvas: $canvas, rootView: $rootView))
     }
     
-    public func invalidate() {
+    public mutating func invalidate() {
         drawingManager.setInvalidate()
     }
     
+    static var uiManager: Rc<Self>?
+    
     public static var main: UIManagerInterface {
-        let impl = UIManagerImplementation(manager: uiManager)
-        return impl
+        uiManager!
+    }
+    static func start(view: consuming DRView) {
+        var manager = UIManager(view: view)
+        manager._drawingManager.start()
+        manager._eventManager.addEvent()
+        
+        uiManager = Rc(wrappedValue: manager)
     }
     
-    static func start(view: DRView) {
-        uiManager = UIManager.init(view: view)
+}
+
+extension Rc: UIManagerInterface where Value == UIManager {
+    public mutating func invalidate() {
+        self.wrappedValue.invalidate()
     }
 }
 
 public protocol UIManagerInterface {
-    func invalidate()
-}
-
-fileprivate class UIManagerImplementation: UIManagerInterface {
-    var manager: UIManager?
-    init(manager: UIManager? = nil) {
-        self.manager = manager
-    }
-    func invalidate() {
-        if let manager {
-            manager.invalidate()
-        }
-    }
-    
+    mutating func invalidate()
 }

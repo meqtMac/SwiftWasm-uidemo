@@ -15,7 +15,7 @@ public protocol CapsuleView: DRView {
 public extension CapsuleView {
     func draw(on context: CanvasRenderingContext2D) {
         context.save()
-        context.setFillStyle(backgroundColor)
+        context.set(background: backgroundColor)
         let radius = min(frame.size.width, frame.size.height) / 2
         context.beginPath()
         context.moveTo(x: frame.origin.x + radius, y: frame.origin.y)

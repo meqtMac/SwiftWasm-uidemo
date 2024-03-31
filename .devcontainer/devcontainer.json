@@ -1,5 +1,5 @@
 {
-    "name": "Canvas-UIDemo",
+    "name": "DRUI-Demo",
     "image": "ghcr.io/swiftwasm/swift:latest",
     "features": {
         "ghcr.io/devcontainers/features/common-utils:2": {

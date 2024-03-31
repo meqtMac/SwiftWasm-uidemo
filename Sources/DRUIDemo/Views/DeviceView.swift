@@ -8,6 +8,7 @@
 import Foundation
 import DOM
 import DRUI
+import RefCount
 
 import OpenCombineShim
 
@@ -32,89 +33,84 @@ class DeviceViewModel: ObservableObject {
     var showSVIP: Bool = true
 }
 
-class DeviceView: RectView {
+let viewModel = DeviceViewModel()
+
+struct DeviceView: RectView {
     private var cancellables = Set<AnyCancellable>()
-    let viewModel: DeviceViewModel
-    
+   
     var userInteractEnabled: Bool = false
     var hidden: Bool = false
     var frame: CGRect
-    var backgroundColor: JSColor
-    var subviews: [DRView]
+    var backgroundColor: Color32
+    var subviews: [DRViewRef]
     
-    var titleView: RectView
-    var playList: RectView
-    var svipView: RectView
-    var adView: RectView
+    @Rc
+    var titleView: RectDRView
+    
+    @Rc
+    var playList: RectDRView
+    
+    @Rc
+    var svipView: RectDRView
+    
+    @Rc
+    var adView: RectDRView
+    
+    @Rc
     var contentView: ContentView
     
-    init(frame: CGRect, backgroundColor: JSColor, viewModel: DeviceViewModel) {
-        self.viewModel = viewModel
+    init(frame: CGRect, backgroundColor: Color32) {
         
         self.frame = frame
         self.backgroundColor = backgroundColor
         
         self.titleView = {
-            let rect = RectDRView()
+            var rect = RectDRView()
             rect.backgroundColor = .yellow
             return rect
         }()
         
         self.playList = {
-            let rect = RectDRView()
+            var rect = RectDRView()
             rect.backgroundColor = .green
             return rect
         }()
         
         self.adView = {
-             let rect = RectDRView()
+             var rect = RectDRView()
             rect.backgroundColor = .red
             return rect
         }()
         
         self.svipView = {
-            let view = RectDRView()
+            var view = RectDRView()
             view.backgroundColor = .yellow
             return view
         }()
         
         self.contentView = {
-            let view = ContentView(viewModel: viewModel)
-            view.backgroundColor = .rgba(0, 255, 0, 0.3)
+            var view = ContentView(viewModel: viewModel)
+            view.backgroundColor = .rgba(0, 255, 0, UInt8(0.3 * 255) )
             return view
         }()
+        self.subviews = []
         
-       self.subviews = [
-                         self.titleView,
-                         self.playList,
-                         self.svipView,
-                         self.adView,
-                         self.contentView
+        self.subviews = [
+            self.$titleView,
+            self.$playList,
+            self.$svipView,
+            self.$adView,
+            self.$contentView
         ]
         
-        self.viewModel
-            .$showPlayList
-            .sink { [weak self] show in
-                self?.playList.hidden = !show
-            }
-            .store(in: &cancellables)
-       
-        self.viewModel
-            .$showAd
-            .sink { [weak self] show in
-                self?.adView.hidden = !show
-            }
-            .store(in: &cancellables)
-        
-        self.viewModel
-            .$showSVIP
-            .sink { [weak self] show in
-                self?.svipView.hidden = !show
-            }
-            .store(in: &cancellables)
-    }
+   }
     
-    func layoutSubviews() {
+    mutating func layoutSubviews() {
+        self.playList.hidden = !viewModel.showPlayList
+        self.adView.hidden = !viewModel.showAd
+        self.svipView.hidden = !viewModel.showSVIP
+        
+        
         let titleHeight: CGFloat = 86
         let playListHeight: CGFloat = 67 + ( (viewModel.device.safeAreaBottom) > 0 ? 7 : 0 )
         
@@ -189,4 +185,12 @@ class DeviceView: RectView {
         return CGSize(width: width, height: height)
     }
 }
+
+//public extension Rc where Value: DRView {
+//    var erase: Rc<DRView> {
+//        let value = self.wrappedValue
+//        return Rc<DRView>(wrappedValue: value)
+//        return self as Rc<DRView>
+//    }
+//}
 

@@ -6,33 +6,34 @@
 //
 
 import Foundation
-import DOM
 
 public extension DRView {
-    func draw(on context: CanvasRenderingContext2D) {
+    mutating func draw(on context: Context2D) {
         // Default do nothing
     }
     
-    func layoutSubviews() {
+    mutating func layoutSubviews() {
         // Default do nothing
     }
     
-    func drawSubviews(on context: CanvasRenderingContext2D) {
+    mutating func drawSubviews(on context: Context2D) {
         layoutSubviews()
         context.save()
         context.translate(x: frame.origin.x, y: frame.origin.y)
-        for subview in self.subviews {
-            if subview.hidden {
+        for ref in self.subviews {
+            var mutref = ref
+            if mutref.value.hidden {
                 continue
             }
-            subview.draw(on: context)
-            subview.drawSubviews(on: context)
+            mutref.value.draw(on: context)
+            mutref.value.drawSubviews(on: context)
         }
         context.restore()
     }
     
-    mutating func addSubview(_ view: some DRView) {
-        subviews.append(view)
+    mutating func addSubview(_ view: consuming some DRView) {
+//        @Rc var view: DRView = view
+        subviews.append(Rc(wrappedValue: view))
     }
     
 }

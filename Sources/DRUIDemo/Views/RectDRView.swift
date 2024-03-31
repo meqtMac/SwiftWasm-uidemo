@@ -10,25 +10,27 @@ import Foundation
 import DOM
 import DRUI
 import JavaScriptKit
+import RefCount
 
-class RectDRView: RectView {
+struct RectDRView: RectView {
+    
     var userInteractEnabled: Bool = false
     var hidden: Bool = false
     
     var frame: CGRect = .init(origin: .init(x: 0, y: 0), size: .init(width: 0, height: 0))
     
-    var backgroundColor: JSColor = .black
+    var backgroundColor: Color32 = .black
     
-    var subviews: [DRView] = []
+    var subviews: [DRViewRef] = []
 }
 
-class CapsuleDRView: CapsuleView {
+struct CapsuleDRView: CapsuleView {
     var userInteractEnabled: Bool = true
     var frame: CGRect = CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: 0, height: 0))
     
-    var backgroundColor: JSColor = .yellow
+    var backgroundColor: Color32 = .yellow
     
-    var subviews: [DRView] = []
+    var subviews: [DRViewRef] = []
     
     var hidden: Bool = false
     
@@ -45,7 +47,7 @@ class CapsuleDRView: CapsuleView {
     }
 }
 
-class DeviceLabelView: DRView {
+struct DeviceLabelView: DRView {
     let viewModel: DeviceViewModel
  
     var userInteractEnabled: Bool = false
@@ -54,9 +56,9 @@ class DeviceLabelView: DRView {
     
     var frame: CGRect
     
-    var backgroundColor: DOM.JSColor
+    var backgroundColor: Color32
     
-    var subviews: [DRView]
+    var subviews: [DRViewRef]
     
     init(viewModel: DeviceViewModel) {
         self.frame = CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: 100, height: 100))

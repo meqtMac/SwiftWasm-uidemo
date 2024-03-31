@@ -7,33 +7,38 @@
 
 import Foundation
 import DOM
+//import RefCount
 
-internal class RootView: DRView {
+internal struct RootView: DRView {
     var userInteractEnabled: Bool = false
     var hidden: Bool = false
     var frame: CGRect
-    var backgroundColor: DOM.JSColor
-    var subviews: [DRView]
+    var backgroundColor: Color32
+    var subviews: [DRViewRef]
     
-    private init(frame: CGRect, subviews: [DRView]) {
+    private init(frame: CGRect, subview: consuming some DRView) {
         self.frame = frame
         self.backgroundColor = .rgba(0, 0, 0, 0)
-        self.subviews = subviews
+       
+//        @Rc
+//        var rc: DRView = subview
+        
+        subviews = [Rc(wrappedValue: subview)]
     }
     
     static func rootView(on canvas: Canvas, view: DRView) -> RootView {
-        let rootView = RootView(frame: CGRect(origin: .init(x: 0, y: 0), size: CGSize(width: CGFloat(canvas.element.width), height: CGFloat(canvas.element.height))), subviews: [view])
+        let rootView = RootView(frame: CGRect(origin: .init(x: 0, y: 0), size: CGSize(width: CGFloat(canvas.element.width), height: CGFloat(canvas.element.height))), subview: view)
         return rootView
     }
     
    
-    func draw(on context: CanvasRenderingContext2D) {
+    mutating func draw(on context: Context2D) {
         context.imageSmoothingEnabled = false
         self.frame = CGRect(origin: .zero, size: CGSize(width: CGFloat(context.canvas.width), height: CGFloat(context.canvas.height)))
         
         context.clear(rect: frame)
         context.save()
-        context.setFillStyle(backgroundColor)
+        context.set(background: backgroundColor)
         context.fill(rect: frame)
         context.restore()
         

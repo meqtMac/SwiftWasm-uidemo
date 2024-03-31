@@ -11,79 +11,84 @@ import WebAPIBase
 import JavaScriptKit
 import DRUI
 import OpenCombineShim
+import RefCount
 
 
-
-class DemoView: RectView {
+struct DemoView: RectView {
     var userInteractEnabled: Bool = false
     var hidden: Bool = false
     var frame: CGRect
-    var backgroundColor: JSColor
-    var subviews: [DRView]
+    var backgroundColor: Color32
+    var subviews: [DRViewRef] = []
     private var cancellables = Set<AnyCancellable>()
     
-    let viewModel = DeviceViewModel()
-    
+    @Rc
     var deviceView: DeviceView
+    @Rc
     var label: DeviceLabelView
-    var buttons: [Button] = []
+    
+    var buttons: [Rc<Button>] = []
+    
+    @Rc
     var settingView: SettingsView
     
-    init(frame: CGRect, backgroundColor: JSColor) {
+    
+    init(frame: CGRect, backgroundColor: Color32) {
         self.frame = frame
         self.backgroundColor = backgroundColor
         viewModel
             .objectWillChange
             .sink { _ in
-                UIManager.main.invalidate()
+                var manager = UIManager.main
+                manager.invalidate()
             }
             .store(in: &cancellables)
         
-        let deviceView = DeviceView(frame: CGRect(origin: CGPoint(x: 0, y: 100), size: viewModel.device.size), backgroundColor: .black, viewModel: viewModel)
+        let deviceView = DeviceView(frame: CGRect(origin: CGPoint(x: 0, y: 100), size: viewModel.device.size), backgroundColor: .black)
         self.deviceView = deviceView
         
         let label = DeviceLabelView(viewModel: viewModel)
         self.label = label
         
         self.subviews = []
-        self.settingView = SettingsView(viewModel: viewModel)
+        self.settingView = SettingsView()
         self.settingView.backgroundColor = .red
         
-        let buttons = [
-            Button(color: .red)  { [weak self] in
-                self?.viewModel.device = .iPhone8plus
+        buttons = [
+            Button(color: .red)  {
+                viewModel.device = .iPhone8plus
             },
-            Button(color: .green)  { [weak self] in
-                self?.viewModel.device = .iPhone13mini
+            Button(color: .green)  {
+                viewModel.device = .iPhone13mini
             },
-            Button(color: .red)  { [weak self] in
-                self?.viewModel.device = .iPhone15
+            Button(color: .red)  {
+                viewModel.device = .iPhone15
             },
-            Button(color: .green)  { [weak self] in
-                self?.viewModel.device = .iPhone15Pro
+            Button(color: .green)  {
+                viewModel.device = .iPhone15Pro
             },
-            Button(color: .red)  { [weak self] in
-                self?.viewModel.device = .iPhone15ProMax
+            Button(color: .red)  {
+                viewModel.device = .iPhone15ProMax
             },
-            Button(color: .green)  { [weak self] in
-                self?.viewModel.device = .iPadMini6
+            Button(color: .green)  {
+                viewModel.device = .iPadMini6
             },
-            Button(color: .red)  { [weak self] in
-                self?.viewModel.device = .iPadMini6_Horizontal
+            Button(color: .red)  {
+                viewModel.device = .iPadMini6_Horizontal
             },
-            Button(color: .green)  { [weak self] in
-                self?.viewModel.device = .iPadPro11inch
+            Button(color: .green)  {
+                viewModel.device = .iPadPro11inch
             },
-            Button(color: .blue)  { [weak self] in
-                self?.viewModel.device = .iPadPro11inch_Horizontal
+            Button(color: .blue)  {
+                viewModel.device = .iPadPro11inch_Horizontal
             },
-        ]
+        ].map { Rc(wrappedValue: $0) }
         
-        self.subviews = [self.deviceView, label, self.settingView] + buttons
-        self.buttons = buttons
+        self.subviews = []
+        self.subviews = [self.$deviceView, self.$label, self.$settingView] + buttons.map { $0 }
     }
     
-    func layoutSubviews() {
+    mutating func layoutSubviews() {
         deviceView.size = viewModel.device.size
         deviceView.left = 0
         deviceView.top = 100
@@ -91,9 +96,9 @@ class DemoView: RectView {
         
         (0..<buttons.count)
             .forEach { index in
-                buttons[index].size = CGSize(width: 50, height: 50)
-                buttons[index].left = 50 * CGFloat(index)
-                buttons[index].top = deviceView.bottom + 50
+                buttons[index].wrappedValue.size = CGSize(width: 50, height: 50)
+                buttons[index].wrappedValue.left = 50 * CGFloat(index)
+                buttons[index].wrappedValue.top = deviceView.bottom + 50
             }
         
         settingView.size = CGSize(width: 400, height: 50 * 4)

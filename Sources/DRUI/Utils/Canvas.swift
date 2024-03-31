@@ -7,8 +7,9 @@
 
 import Foundation
 import DOM
+import WebAPIBase
 
-struct Canvas {
+public struct Canvas {
     internal let element: HTMLCanvasElement
     var context: CanvasRenderingContext2D {
         element.getContext(CanvasRenderingContext2D.self)!
@@ -18,5 +19,14 @@ struct Canvas {
         element = HTMLCanvasElement(from: globalThis.document.createElement(localName: "canvas"))!
         element.width = width
         element.height = height
+    }
+}
+
+public typealias Context2D = DOM.CanvasRenderingContext2D
+
+public extension Context2D {
+    func set(background color: Color32) {
+        let jsColor = JSColor.rgba(color.r, color.g, color.b, Double(color.a) / 255.0)
+        setFillStyle(jsColor)
     }
 }
