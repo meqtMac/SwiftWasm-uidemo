@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import DOM
 import DRUI
 import OpenCombineShim
 
@@ -110,7 +109,7 @@ struct SettingCell: DRView {
         subviews.append($button)
     }
     
-    func draw(on context: CanvasRenderingContext2D) {
+    func draw(on context: Context2D) {
         context.save()
         context.setFillStyle(.rgba(0, 0, 0, 0.1))
         context.fill(rect: self.frame)

@@ -7,10 +7,7 @@
 
 
 import Foundation
-import DOM
 import DRUI
-import JavaScriptKit
-import RefCount
 
 struct RectDRView: RectView {
     
@@ -35,15 +32,12 @@ struct CapsuleDRView: CapsuleView {
     var hidden: Bool = false
     
     func touchBegin(with point: CGPoint) {
-        globalThis.alert(message: "\(JSDate())")
     }
     
     func touchMove(with point: CGPoint) {
-        print("")
     }
     
     func touchEnd(with point: CGPoint) {
-        globalThis.alert(message: "Volume Up")
     }
 }
 
@@ -67,7 +61,7 @@ struct DeviceLabelView: DRView {
         self.viewModel = viewModel
     }
     
-    func draw(on context: CanvasRenderingContext2D) {
+    func draw(on context: Context2D) {
         context.save()
         context.font = "16px Arial"
         let device = viewModel.device

@@ -6,9 +6,6 @@
 //
 
 import Foundation
-//import DOM
-//import JavaScriptKit
-import WebAPIBase
 
 import WebGL1
 import WebGL2

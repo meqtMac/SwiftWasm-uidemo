@@ -48,7 +48,7 @@ extension Rc where Value == EventManager {
                 
                 print("mousedown: \(#file), \(#line))")
                 weakRef?.getResponder(event: event)
-                console.log(data: "\(weakRef)".jsValue)
+                console.log(data: "\(String(describing: weakRef))".jsValue)
                 guard var response = weakRef?.response else {
                     return
                 }
