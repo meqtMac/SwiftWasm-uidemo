@@ -18,7 +18,7 @@ internal struct RootView: DRView {
     
     private init(frame: CGRect, subview: consuming some DRView) {
         self.frame = frame
-        self.backgroundColor = .rgba(0, 0, 0, 0)
+        self.backgroundColor =  .transparent
        
 //        @Rc
 //        var rc: DRView = subview

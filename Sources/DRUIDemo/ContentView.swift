@@ -18,7 +18,7 @@ struct ContentView: RectView {
     
     var frame: CGRect = CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: 0, height: 0))
     
-    var backgroundColor: Color32 = .rgba(0, 255, 0, UInt8(0.1 * 255))
+    var backgroundColor: Color32 = .init(r: 0, g: 255, b: 0, a: UInt8(0.1 * 255))
     
     var subviews: [DRViewRef] = []
     
@@ -38,19 +38,21 @@ struct ContentView: RectView {
         
         self.topContainer = {
             var view = RectDRView()
-            view.backgroundColor = .rgba(255, 255, 255,  UInt8(0.4 * 255))
+            view.backgroundColor = .fromWhiteAlpha( UInt8(0.4 * 255) )
             return view
         }()
         
         self.centerContainer = {
             var view = RectDRView()
-            view.backgroundColor = .rgba(255, 255, 255, UInt8(0.4 * 255))
+            view.backgroundColor = .fromWhiteAlpha( UInt8(0.4 * 255) )
+
             return view
         }()
         
         self.bottomView = {
             var view = CapsuleDRView()
-             view.backgroundColor = .rgba(255, 255, 255, UInt8(0.4 * 255))
+             view.backgroundColor = .fromWhiteAlpha( UInt8(0.4 * 255) )
+
             return view
         }()
         

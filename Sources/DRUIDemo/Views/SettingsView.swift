@@ -16,7 +16,7 @@ struct SettingsView: DRView {
     
     var frame: CGRect = CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: 0, height: 0))
     
-    var backgroundColor: Color32 = .rgba(0, 255, 0, 26)
+    var backgroundColor: Color32 = .init(r: 0, g: 255, b: 0, a: 26)
     
     var subviews: [DRViewRef] {
         get { views.map { $0 } }
@@ -32,7 +32,7 @@ struct SettingsView: DRView {
     init() {
         self.userInteractEnabled = false
         self.frame = CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: 0, height: 0))
-        self.backgroundColor = .rgba(0, 0, 0, 0)
+        self.backgroundColor = .transparent
         views = [
             SettingCell(text: "playlist", backgroundColor: .blue) { [weak viewModel] in
                 viewModel?.showPlayList.toggle()
@@ -96,7 +96,7 @@ struct SettingCell: DRView {
     var text: String
     var userInteractEnabled: Bool = false
     var frame: CGRect = CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: 0, height: 0))
-    var backgroundColor: Color32 = .rgba(0, 0, 0, 0)
+    var backgroundColor: Color32 = .transparent
     var subviews: [DRViewRef] = []
     @Rc
     var button: Button

@@ -87,7 +87,7 @@ struct DeviceView: RectView {
         
         self.contentView = {
             var view = ContentView(viewModel: viewModel)
-            view.backgroundColor = .rgba(0, 255, 0, UInt8(0.3 * 255) )
+            view.backgroundColor = .init(r: 0, g: 255, b: 0, a: UInt8(0.3 * 255))
             return view
         }()
         self.subviews = []
