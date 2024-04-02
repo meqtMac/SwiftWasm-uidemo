@@ -7,12 +7,12 @@
 
 import Foundation
 
-public protocol From {
+public protocol From<T> {
     associatedtype T
     init(_ value: T)
 }
 
-public protocol Into {
+public protocol Into<T> {
     associatedtype T
-    static func into() -> T
+    func into() -> T
 }

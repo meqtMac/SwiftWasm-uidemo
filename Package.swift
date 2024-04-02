@@ -20,12 +20,12 @@ let package = Package(
             name: "DRUI",
             targets: ["DRUI"]
         ),
-   ],
+    ],
     dependencies: [
-        .package(
-            url: "https://github.com/swiftwasm/JavaScriptKit.git",
-            from: "0.18.0"
-        ),
+//        .package(
+//            url: "https://github.com/swiftwasm/JavaScriptKit.git",
+//            from: "0.18.0"
+//        ),
         .package(
             url: "https://github.com/OpenCombine/OpenCombine.git",
             from: "0.14.0"
@@ -44,7 +44,6 @@ let package = Package(
         .executableTarget(
             name: "DRUIDemo",
             dependencies: [
-//                "DOM", 
                 "DRUI",
                 .product(
                     name: "OpenCombineShim",
@@ -57,64 +56,20 @@ let package = Package(
             dependencies: [
                 .product(name: "DOM", package: "WebAPIKit"),
                 .product(name: "WebGL2", package: "WebAPIKit"),
-//                .product(name: "", package: <#T##String#>)
-//                "DOM",
-//                           "WebGL2",
-                           "RefCount"
-                          ]
+                "RefCount",
+                "DRColor",
+                "DRMath"
+            ]
         ),
+        .target(
+            name: "DRPaint",
+            dependencies: [
+                "DRColor",
+                "DRMath"
+            ]
+        ),
+        .target(name: "DRColor"),
+        .target(name: "DRMath"),
         .target(name: "RefCount"),
-//        .target(
-//            name: "WebAPIBase",
-//            dependencies: ["ECMAScript"]
-//        ),
-//        .target(
-//            name: "DOM",
-//            dependencies: ["WebAPIBase", "ECMAScript"]
-//        ),
-//        .target(
-//            name: "WebSockets",
-//            dependencies: ["DOM", "WebAPIBase", "ECMAScript"]
-//        ),
-//        .target(
-//            name: "WebAnimations",
-//            dependencies: ["DOM", "WebAPIBase", "ECMAScript"]
-//        ),
-//        .target(
-//            name: "WebGL1",
-//            dependencies: ["DOM", "WebAPIBase", "WebAnimations", "ECMAScript"]
-//        ),
-//        .target(
-//            name: "WebGL2",
-//            dependencies: ["DOM", "WebAPIBase", "WebAnimations", "WebGL1", "ECMAScript"]
-//        ),
-//        .target(
-//            name: "WebGPU",
-//            dependencies: ["DOM", "WebAPIBase", "WebAnimations", "WebGL1", "ECMAScript"]
-//        ),
-//        .target(
-//            name: "Gamepad",
-//            dependencies: ["DOM", "WebAPIBase", "ECMAScript"]
-//        ),
-//        .target(
-//            name: "CSSOM",
-//            dependencies: ["DOM", "WebAPIBase", "SVG", "ECMAScript"]
-//        ),
-//        .target(
-//            name: "SVG",
-//            dependencies: ["DOM", "WebAPIBase", "ECMAScript"]
-//        ),
-//        .target(
-//            name: "FileSystem",
-//            dependencies: ["DOM", "WebAPIBase", "ECMAScript"]
-//        ),
-//       .target(
-//            name: "ECMAScript",
-//            dependencies: [
-//                "JavaScriptKit",
-//                .product(name: "JavaScriptEventLoop", package: "JavaScriptKit"),
-//                .product(name: "JavaScriptBigIntSupport", package: "JavaScriptKit"),
-//            ]
-//        ),
     ]
 )

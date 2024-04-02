@@ -5,10 +5,7 @@
 //  Created by 蒋艺 on 2024/3/26.
 //
 
-// Import required types
-import Foundation
-
-// MARK: - TSTransform
+// MARK: - Checked
 
 /// Linearly transforms positions via a translation, then a scaling.
 ///
@@ -22,31 +19,17 @@ public struct TSTransform: Equatable {
     /// Translation amount, applied after scaling.
     public let translation: Vec2
     
-}
-
-// Default implementation for TSTransform
-extension TSTransform {
-    public static let identity = Self(translation: .zero, scaling: 1.0)
-    
-    /// Creates a new transform that first scales points around `(0, 0)`,
-    /// then translates them.
-    public init(translation: Vec2, scaling: Float) {
-        self.translation = translation
+    /// Creates a new translation that first scales points around
+    /// `(0, 0)`, then translates them.
+    @inlinable
+    public init(scaling: Float32, translation: Vec2) {
         self.scaling = scaling
-    }
-    
-    public static func fromTranslation(_ translation: Vec2) -> Self {
-        return Self(translation: translation, scaling: 1.0)
-    }
-    
-    public static func fromScaling(_ scaling: Float) -> Self {
-        return Self(translation: .zero, scaling: scaling)
+        self.translation = translation
     }
 }
 
-// MARK: - TSTransform Methods
-
-extension TSTransform {
+public extension TSTransform {
+    static let identity = Self(scaling: 1.0, translation: .zero)
     /// Inverts the transform.
     ///
     /// ```swift
@@ -60,10 +43,10 @@ extension TSTransform {
     /// assertEqual(ts.inverse().inverse(), ts)
     /// ```
     @inlinable
-    public func inverse() -> TSTransform {
+    func inverse() -> TSTransform {
         return TSTransform(
-            translation: Vec2( -translation.x, -translation.y) / scaling,
-            scaling: 1.0 / scaling
+            scaling: 1.0 / scaling,
+            translation: -translation / scaling
         )
     }
     
@@ -77,8 +60,8 @@ extension TSTransform {
     /// assertEqual(ts.mulPos(p2), Pos2(x: 12.0, y: 5.0))
     /// ```
     @inlinable
-    public static func * (lhs: Self, rhs: Pos2) -> Pos2 {
-        return  rhs * lhs.scaling + Pos2(lhs.translation.x, lhs.translation.y)
+    static func * (lhs: Self, rhs: Pos2) -> Pos2 {
+        return  rhs * lhs.scaling + lhs.translation
     }
     
     /// Transforms the given rectangle.
@@ -91,14 +74,24 @@ extension TSTransform {
     /// assertEqual(transformed.max, Pos2(x: 46.0, y: 30.0))
     /// ```
     @inlinable
-    public static func * (lhs: Self, rhs: Rect) -> Rect {
+    static func * (lhs: Self, rhs: Rect) -> Rect {
         Rect(
             min: lhs * rhs.min,
             max: lhs * rhs.max
         )
     }
+    
+    /// Applies the right hand side transform, then the left hand side.
+    ///
+    /// ```
+    /// # use emath::{TSTransform, vec2};
+    /// let ts1 = TSTransform::new(vec2(1.0, 0.0), 2.0);
+    /// let ts2 = TSTransform::new(vec2(-1.0, -1.0), 3.0);
+    /// let ts_combined = TSTransform::new(vec2(2.0, -1.0), 6.0);
+    /// assert_eq!(ts_combined, ts2 * ts1);
+    /// ```
+    @inlinable
+    static func * (lhs: Self, rhs: Self) -> Self {
+        TSTransform(scaling: lhs.scaling * rhs.scaling, translation: lhs.translation + lhs.scaling * rhs.translation)
+    }
 }
-
-// MARK: - TSTransform Conformances
-
-// Conformance for vector multiplication
