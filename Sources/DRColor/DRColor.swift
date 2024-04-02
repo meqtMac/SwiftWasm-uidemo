@@ -121,7 +121,8 @@ public func linearU8FromLinearF32(_ a: Float32) -> UInt8 {
 
 
 fileprivate func fastRound(_ r: Float32) -> UInt8 {
-    return UInt8((r + 0.5).rounded(.toNearestOrEven))
+//    return UInt8((r + 0.5).rounded(.toNearestOrEven))
+    return UInt8(r.rounded())
 }
 
 ///// An assert that is only active when `epaint` is compiled with the `extra_asserts` feature
@@ -137,13 +138,27 @@ fileprivate func fastRound(_ r: Float32) -> UInt8 {
 //    }
 //}
 
-public func gammaFromLinear(linear: Float32) -> Float32 {
+/// gamma [0, 1] -> linear [0, 1] (not clamped).
+/// Works for numbers outside this range (e.g. negative numbers).
+public func linearfromGamma(_ gamma: Float32) -> Float32 {
+    if gamma < 0.0 {
+        -linearfromGamma(-gamma)
+    } else if gamma <= 0.04045 {
+        gamma / 12.92
+    } else {
+        pow((gamma + 0.055) / 1.055, 2.4)
+    }
+}
+
+
+
+public func gammaFromLinear(_ linear: Float32) -> Float32 {
     if linear < 0.0 {
-        return -gammaFromLinear(linear: -linear)
+        return -gammaFromLinear(-linear)
     } else if linear <= 0.0031308 {
         return 12.92 * linear
     } else {
-        return 1.055 * pow(linear, 1.0/2.5) - 0.055
+        return 1.055 * pow(linear, 1.0/2.4) - 0.055
     }
 }
 

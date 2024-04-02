@@ -50,7 +50,15 @@ public struct Color32: Hashable, Equatable {
         self.a = linearU8FromLinearF32(rgba.a)
     }
     
+     @inlinable
+    public init(hsva: Hsva) {
+        self.init(rgba: Rgba(hsva: hsva))
+    }
     
+    @inlinable
+    public init(hsvaGamma: HsvaGamma) {
+        self.init(rgba: Rgba(hsvaGamma: hsvaGamma))
+    }
     
     
 }

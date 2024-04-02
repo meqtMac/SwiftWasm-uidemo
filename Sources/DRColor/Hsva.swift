@@ -49,8 +49,12 @@ public struct Hsva: Hashable, Equatable {
         self = Hsva(rgba: Rgba(srgba: srgba))
     }
     
-
-
+    public init(hsvaGama: HsvaGamma) {
+        self.h = hsvaGama.h
+        self.s = hsvaGama.s
+        self.v = linearfromGamma( hsvaGama.v)
+        self.a = hsvaGama.a
+    }
 }
 
 public extension Hsva {

@@ -33,7 +33,7 @@ public struct HsvaGamma: Equatable, Hashable {
     public init(hsva: Hsva) {
         self.h = hsva.h
         self.s = hsva.s
-        self.v = gammaFromLinear(linear: hsva.v)
+        self.v = gammaFromLinear(hsva.v)
         self.a = hsva.a
     }
     

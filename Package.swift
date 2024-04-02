@@ -92,6 +92,12 @@ let package = Package(
         ),
         .target(name: "RefCount"),
         .target(name: "RustHelper"),
+        .testTarget(
+            name: "DRColorTest",
+            dependencies: [
+                "DRColor"
+            ]
+        )
         // WASI not support macro yet
         //"DRColorMacroImpl"
         //        .macro(

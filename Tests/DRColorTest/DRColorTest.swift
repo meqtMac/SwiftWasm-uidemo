@@ -1,35 +1,33 @@
 //
 //  DRColorTest.swift
-//  
+//
 //
 //  Created by 蒋艺 on 2024/4/2.
 //
 
 import XCTest
+import DRColor
 
 final class DRColorTest: XCTestCase {
-
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-    }
-
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
-
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-        // Any test you write for XCTest can be annotated as throws and async.
-        // Mark your test throws to produce an unexpected failure when your test encounters an uncaught error.
-        // Mark your test async to allow awaiting for asynchronous code to complete. Check the results with assertions afterwards.
-    }
-
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
+    
+    func testHsvRoundtrip() {
+        for r in UInt8(0)...255 {
+            for g in UInt8(0)...255 {
+                for b in UInt8(0)...255 {
+                    let srgba = Color32(r: r, g: g, b: b, a: 255)
+                    let hsva = Hsva(srgba: srgba)
+                    XCTAssertEqual(srgba, Color32(hsva: hsva))
+                }
+            }
         }
     }
-
+    
+    func testSrgbaConversion() {
+        for b in UInt8(0)...255 {
+            let l = linearF32FromGammaU8(b)
+            XCTAssertTrue(0 <= l && l <= 1)
+            XCTAssertEqual(gammaU8FromLinearF32(l), b)
+        }
+    }
+    
 }

@@ -29,6 +29,21 @@ public struct Rgba: Equatable, Hashable {
         self.b = b
         self.a = a
     }
+    
+    @inlinable
+    public init(hsva: Hsva) {
+        let (r, g, b, a) = hsva.toRgbaUnmultiplied()
+        self.r = r
+        self.g = g
+        self.b = b
+        self.a = a
+    }
+    
+     @inlinable
+    public init(hsvaGamma: HsvaGamma) {
+       self.init(hsva: Hsva(hsvaGama: hsvaGamma))
+    }
+    
  
 //    public init
 }
