@@ -26,8 +26,7 @@ jobs:
         shell: bash
         run: |
           set -ex
-		  swift --version
-
+          swift --version
           swift run carton test
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
