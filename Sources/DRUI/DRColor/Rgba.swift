@@ -8,7 +8,8 @@
 import Foundation
 
 /// 0-1 linear space `RGBA` color with premultiplied alpha.
-public struct Rgba {
+@frozen
+public struct Rgba: Equatable, Hashable {
     public var r: Float32
     public var g: Float32
     public var b: Float32

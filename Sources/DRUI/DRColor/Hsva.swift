@@ -7,6 +7,7 @@
 
 /// Hue, saturation, value, alpha. All in the range [0, 1].
 /// No premultiplied alpha.
+@frozen
 public struct Hsva: Hashable, Equatable {
     /// hue 0-1
     public var h: Float32

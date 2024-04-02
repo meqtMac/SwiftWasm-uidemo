@@ -6,3 +6,13 @@
 //
 
 import Foundation
+
+public protocol From {
+    associatedtype T
+    init(_ value: T)
+}
+
+public protocol Into {
+    associatedtype T
+    static func into() -> T
+}

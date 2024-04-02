@@ -7,7 +7,8 @@
 
 /// Like Hsva but with the `v` value (brightness) being gamma corrected
 /// so that it is somewhat perceptually even.
-public struct HsvaGamma {
+@frozen
+public struct HsvaGamma: Equatable, Hashable {
     /// hue 0-1
     public var h: Float32
     

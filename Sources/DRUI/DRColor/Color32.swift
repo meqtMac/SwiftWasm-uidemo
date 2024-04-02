@@ -15,7 +15,7 @@
 ///
 /// The special value of alpha=0 means the color is to be treated as an additive color.
 @frozen
-public struct Color32 {
+public struct Color32: Hashable, Equatable {
     
     public var r: UInt8
     
