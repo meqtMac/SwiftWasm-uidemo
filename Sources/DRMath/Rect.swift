@@ -363,8 +363,8 @@ public extension Rect {
     @inlinable
     func lerpInside(t: Vec2) -> Pos2 {
         Pos2(
-            x: DRUI.lerp(min.x...max.x, t.x),
-            y: DRUI.lerp(min.y...max.y, t.y)
+            x: lerp(min.x...max.x, t.x),
+            y: lerp(min.y...max.y, t.y)
         )
     }
     

@@ -20,7 +20,11 @@
 
 import RefCount
 import WebAPIBase
+import DRColor
 
 public typealias Rc = RefCount.Rc
 public typealias Weak = RefCount.Weak
 public typealias console = WebAPIBase.console
+public typealias Color32 = DRColor.Color32
+
+

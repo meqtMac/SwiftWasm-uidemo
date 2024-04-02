@@ -6,6 +6,12 @@
 //
 
 import Foundation
+#if canImport(DRColorMacroImpl)
+import DRColorMacroImpl
+
+@freestanding(expression)
+public macro hexColor(_ hexString: StaticString) -> Color32 = #externalMacro(module: "DRColorMacroImpl", type: "HexToColorMacro")
+#endif
 
 /// Color conversions and types.
 ///

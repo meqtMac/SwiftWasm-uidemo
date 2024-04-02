@@ -184,7 +184,7 @@ public extension Hsva {
     ///
     /// - Returns: The premultiplied RGBA components.
     @inlinable func toRgbaPremultiplied() -> (r:Float, g: Float32, b: Float32, a: Float32)  {
-        let (r, g, b, a) = self.toRgbaUnmultiplied()
+        let (r, g, b, _) = self.toRgbaUnmultiplied()
         let additive = self.a < 0.0
         if additive {
             return (r, g, b, 0.0)

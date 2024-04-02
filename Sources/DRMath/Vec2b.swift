@@ -5,6 +5,7 @@
 //  Created by 蒋艺 on 2024/3/26.
 //
 // MARK: Checked
+import RustHelper
 
 /// Two bools, one for each axis (X and Y).
 @frozen

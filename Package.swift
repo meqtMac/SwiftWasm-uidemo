@@ -2,7 +2,10 @@
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
+import CompilerPluginSupport
 
+
+//let packageName =  "swiftwasm-uidemo"
 let package = Package(
     name: "swiftwasm-uidemo",
     platforms: [
@@ -22,10 +25,10 @@ let package = Package(
         ),
     ],
     dependencies: [
-//        .package(
-//            url: "https://github.com/swiftwasm/JavaScriptKit.git",
-//            from: "0.18.0"
-//        ),
+        //        .package(
+        //            url: "https://github.com/swiftwasm/JavaScriptKit.git",
+        //            from: "0.18.0"
+        //        ),
         .package(
             url: "https://github.com/OpenCombine/OpenCombine.git",
             from: "0.14.0"
@@ -38,7 +41,12 @@ let package = Package(
             url: "https://github.com/swiftwasm/carton",
             from: "1.0.0"
         ),
-        .package(path: "WebAPIKit")
+        // local web api kit dependency
+        .package(path: "WebAPIKit"),
+        // WASI not support macro yet
+        // Depend on the Swift 5.9 release of SwiftSyntax
+        //        .package(url: "https://github.com/apple/swift-syntax.git", from: "509.0.0"),
+        //            .packageu
     ],
     targets: [
         .executableTarget(
@@ -68,8 +76,39 @@ let package = Package(
                 "DRMath"
             ]
         ),
-        .target(name: "DRColor"),
-        .target(name: "DRMath"),
+        .target(
+            name: "DRColor",
+            dependencies: [
+                "RustHelper",
+                // WASI not support macro yet
+                //"DRColorMacroImpl"
+            ]
+        ),
+        .target(
+            name: "DRMath",
+            dependencies: [
+                "RustHelper"
+            ]
+        ),
         .target(name: "RefCount"),
+        .target(name: "RustHelper"),
+        // WASI not support macro yet
+        //"DRColorMacroImpl"
+        //        .macro(
+        //            name: "DRColorMacroImpl",
+        //            dependencies: [
+        //                .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
+        //                .product(name: "SwiftCompilerPlugin", package: "swift-syntax")
+        //            ]
+        //        ),
+        // A test target used to develop the macro implementation.
+        //        .testTarget(
+        //            name: "DRColorMacroTests",
+        //            dependencies: [
+        //                "DRColorMacroImpl",
+        //                .product(name: "SwiftSyntaxMacrosTestSupport", package: "swift-syntax"),
+        //            ]
+        //        ),
+        
     ]
 )

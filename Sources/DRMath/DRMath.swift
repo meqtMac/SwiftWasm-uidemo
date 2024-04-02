@@ -5,20 +5,7 @@
 //  Created by 蒋艺 on 2024/4/2.
 //
 
-
-public extension FloatingPoint {
-    @inlinable
-    func max(_ other: Self) -> Self {
-        return Swift.max(self, other)
-    }
-    
-    @inlinable
-    func min(_ other: Self) -> Self {
-        return Swift.min(self, other)
-    }
-}
-
-
+import Foundation
 
 /// Linear interpolation.
 ///
@@ -157,19 +144,6 @@ public func almostEqual(_ a: Float32, _ b: Float32, epsilon: Float32) -> Bool {
 /// assert!((2.0f32).clamp(-2.0, 1.0) == 1.0);
 /// assert!((f32::NAN).clamp(-2.0, 1.0).is_nan());
 /// ```
-//#[must_use = "method returns a new number and does not mutate the original value"]
-//#[stable(feature = "clamp", since = "1.50.0")]
-//#[inline]
-//pub fn clamp(mut self, min: f32, max: f32) -> f32 {
-//    assert!(min <= max, "min > max, or either was NaN. min = {min:?}, max = {max:?}");
-//    if self < min {
-//        self = min;
-//    }
-//    if self > max {
-//        self = max;
-//    }
-//    self
-//}
 public extension FloatingPoint {
     
     @inlinable
@@ -193,6 +167,17 @@ public extension FloatingPoint {
             self = max
         }
     }
+    
+    @inlinable
+    func max(_ other: Self) -> Self {
+        return Swift.max(self, other)
+    }
+    
+    @inlinable
+    func min(_ other: Self) -> Self {
+        return Swift.min(self, other)
+    }
+    
 }
 
 /// Calculate a lerp-factor for exponential smoothing using a time step.
@@ -234,7 +219,9 @@ public func interpolationFactor(startTime: Double, endTime: Double, currentTime:
 ///
 /// `f(0) = 0, f'(0) = 0, f(1) = 1, f'(1) = 0`.
 @inline(__always)
-public func easeInEaseOut(t: Float) -> Float {
-    let t = max(0.0, min(t, 1.0))
-    return (3.0 * t * t - 2.0 * t * t * t).clamped(to: 0.0...1.0)
+public func easeInEaseOut(t: Float32) -> Float32 {
+    let t = t.min(1.0).max(0.0)
+    let t2 = 3 * t * t
+    let t3 = 2 * t * t * t
+    return (t2 - t3).clamped(min: 0.0, max: 1.0)
 }

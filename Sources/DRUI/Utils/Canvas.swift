@@ -7,7 +7,7 @@
 
 import Foundation
 import DOM
-import WebAPIBase
+import DRColor
 
 public struct Canvas {
     internal let element: HTMLCanvasElement
