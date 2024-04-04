@@ -5,25 +5,18 @@ import PackageDescription
 import CompilerPluginSupport
 
 
-//let packageName =  "swiftwasm-uidemo"
 let package = Package(
-    name: "swiftwasm-uidemo",
+    name: "DRUIDemo",
     platforms: [
         .macOS(.v13),
         .iOS(.v15),
-        .watchOS(.v6),
-        .tvOS(.v13)
     ],
     products: [
         .executable(
             name: "DRUIDemo",
             targets: ["DRUIDemo"]
         ),
-        .library(
-            name: "DRUI",
-            targets: ["DRUI"]
-        ),
-    ],
+   ],
     dependencies: [
         //        .package(
         //            url: "https://github.com/swiftwasm/JavaScriptKit.git",
@@ -42,7 +35,14 @@ let package = Package(
             from: "1.0.0"
         ),
         // local web api kit dependency
-        .package(path: "WebAPIKit"),
+        .package(
+            name: "WebAPIKit",
+            path: "SubPackages/WebAPIKit"
+        ),
+        .package(
+            name: "DRUI",
+            path: "SubPackages/DRUI"
+        ),
         // WASI not support macro yet
         // Depend on the Swift 5.9 release of SwiftSyntax
         //        .package(url: "https://github.com/apple/swift-syntax.git", from: "509.0.0"),
@@ -52,7 +52,8 @@ let package = Package(
         .executableTarget(
             name: "DRUIDemo",
             dependencies: [
-                "DRUI",
+//                .product(name: "DRUI", package: "DRUI"),
+                "DRFrame",
                 .product(
                     name: "OpenCombineShim",
                     package: "OpenCombine"
@@ -60,61 +61,18 @@ let package = Package(
             ]
         ),
         .target(
-            name: "DRUI",
+            name: "DRGlow",
+            dependencies: [
+                .product(name: "DRUI", package: "DRUI")
+            ]
+        ),
+        .target(
+            name: "DRFrame",
             dependencies: [
                 .product(name: "DOM", package: "WebAPIKit"),
                 .product(name: "WebGL2", package: "WebAPIKit"),
-                "RefCount",
-                "DRColor",
-                "DRMath"
+                   .product(name: "DRUI", package: "DRUI")
             ]
         ),
-        .target(
-            name: "DRPaint",
-            dependencies: [
-                "DRColor",
-                "DRMath"
-            ]
-        ),
-        .target(
-            name: "DRColor",
-            dependencies: [
-                "RustHelper",
-                // WASI not support macro yet
-                //"DRColorMacroImpl"
-            ]
-        ),
-        .target(
-            name: "DRMath",
-            dependencies: [
-                "RustHelper"
-            ]
-        ),
-        .target(name: "RefCount"),
-        .target(name: "RustHelper"),
-        .testTarget(
-            name: "DRColorTest",
-            dependencies: [
-                "DRColor"
-            ]
-        )
-        // WASI not support macro yet
-        //"DRColorMacroImpl"
-        //        .macro(
-        //            name: "DRColorMacroImpl",
-        //            dependencies: [
-        //                .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
-        //                .product(name: "SwiftCompilerPlugin", package: "swift-syntax")
-        //            ]
-        //        ),
-        // A test target used to develop the macro implementation.
-        //        .testTarget(
-        //            name: "DRColorMacroTests",
-        //            dependencies: [
-        //                "DRColorMacroImpl",
-        //                .product(name: "SwiftSyntaxMacrosTestSupport", package: "swift-syntax"),
-        //            ]
-        //        ),
-        
     ]
 )

@@ -9,6 +9,7 @@ import Foundation
 //import DOM
 //import WebAPIBase
 //import JavaScriptKit
+import DRFrame
 import DRUI
 //import RefCount
 
@@ -24,13 +25,13 @@ struct ContentView: RectView {
     
     var hidden: Bool = false
     
-    @Rc
+    @Arc
     var topContainer: RectDRView
     
-    @Rc
+    @Arc
     var centerContainer: RectDRView
     
-    @Rc
+    @Arc
     var bottomView: CapsuleDRView
     
     init(viewModel: DeviceViewModel) {

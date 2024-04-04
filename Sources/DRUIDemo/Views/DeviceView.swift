@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import DRFrame
 import DRUI
 import OpenCombineShim
 
@@ -41,19 +42,19 @@ struct DeviceView: RectView {
     var backgroundColor: Color32
     var subviews: [DRViewRef]
     
-    @Rc
+    @Arc
     var titleView: RectDRView
     
-    @Rc
+    @Arc
     var playList: RectDRView
     
-    @Rc
+    @Arc
     var svipView: RectDRView
     
-    @Rc
+    @Arc
     var adView: RectDRView
     
-    @Rc
+    @Arc
     var contentView: ContentView
     
     init(frame: CGRect, backgroundColor: Color32) {

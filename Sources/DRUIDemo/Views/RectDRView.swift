@@ -7,6 +7,7 @@
 
 
 import Foundation
+import DRFrame
 import DRUI
 
 struct RectDRView: RectView {

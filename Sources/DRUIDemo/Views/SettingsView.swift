@@ -6,8 +6,9 @@
 //
 
 import Foundation
-import DRUI
+import DRFrame
 import OpenCombineShim
+import DRUI
 
 struct SettingsView: DRView {
     
@@ -25,7 +26,7 @@ struct SettingsView: DRView {
         }
     }
     
-    var views: [Rc<SettingCell>] = []
+    var views: [Arc<SettingCell>] = []
     
     var hidden: Bool = false
     
@@ -48,7 +49,7 @@ struct SettingsView: DRView {
                 viewModel?.showAd.toggle()
             },
         ].map {
-            Rc(wrappedValue: $0)
+            Arc(wrappedValue: $0)
         }
         
         var views = self.views
@@ -98,7 +99,7 @@ struct SettingCell: DRView {
     var frame: CGRect = CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: 0, height: 0))
     var backgroundColor: Color32 = .transparent
     var subviews: [DRViewRef] = []
-    @Rc
+    @Arc
     var button: Button
     
     var hidden: Bool = false

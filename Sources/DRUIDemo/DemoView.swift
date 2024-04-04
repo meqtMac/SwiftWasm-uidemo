@@ -9,6 +9,7 @@ import Foundation
 //import DOM
 //import WebAPIBase
 //import JavaScriptKit
+import DRFrame
 import DRUI
 import OpenCombineShim
 //import RefCount
@@ -22,14 +23,14 @@ struct DemoView: RectView {
     var subviews: [DRViewRef] = []
     private var cancellables = Set<AnyCancellable>()
     
-    @Rc
+    @Arc
     var deviceView: DeviceView
-    @Rc
+    @Arc
     var label: DeviceLabelView
     
-    var buttons: [Rc<Button>] = []
+    var buttons: [Arc<Button>] = []
     
-    @Rc
+    @Arc
     var settingView: SettingsView
     
     
@@ -82,7 +83,7 @@ struct DemoView: RectView {
             Button(color: .blue)  {
                 viewModel.device = .iPadPro11inch_Horizontal
             },
-        ].map { Rc(wrappedValue: $0) }
+        ].map { Arc(wrappedValue: $0) }
         
         self.subviews = []
         self.subviews = [self.$deviceView, self.$label, self.$settingView] + buttons.map { $0 }
