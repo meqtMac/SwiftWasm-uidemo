@@ -15,13 +15,13 @@
 /// conflict with the unit (one point = X physical pixels).
 public struct Pos2: Equatable, Hashable {
     /// How far to the right.
-    public var x: Float
+    public var x: Float32
     
     /// How far down.
-    public var y: Float
+    public var y: Float32
     // implicit w = 1
     
-    public init(x: Float, y: Float) {
+    public init(x: Float32, y: Float32) {
         self.x = x
         self.y = y
     }
