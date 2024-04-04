@@ -6,7 +6,7 @@ import CompilerPluginSupport
 
 
 let package = Package(
-    name: "DRUIDemo",
+    name: "UIDemo",
     platforms: [
         .macOS(.v13),
         .iOS(.v15),
@@ -71,7 +71,7 @@ let package = Package(
             dependencies: [
                 .product(name: "DOM", package: "WebAPIKit"),
                 .product(name: "WebGL2", package: "WebAPIKit"),
-                   .product(name: "DRUI", package: "DRUI")
+                .product(name: "DRUI", package: "DRUI")
             ]
         ),
     ]
