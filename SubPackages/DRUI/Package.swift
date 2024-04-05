@@ -17,7 +17,7 @@ let package = Package(
     dependencies: [
        // WASI not support macro yet
         // Depend on the Swift 5.9 release of SwiftSyntax
-                .package(url: "https://github.com/apple/swift-syntax.git", from: "509.0.0"),
+//        .package(url: "https://github.com/apple/swift-syntax.git", from: "509.0.0"),
     ],
     targets: [
        .target(

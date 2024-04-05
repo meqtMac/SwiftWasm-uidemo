@@ -7,6 +7,7 @@
 
 import DRMath
 import DRColor
+import Foundation
 
 /// Tessellation quality options
 public struct TessellationOptions {
@@ -71,19 +72,189 @@ public struct TessellationOptions {
 ///
 /// See also [`tessellate_shapes`], a convenient wrapper around [`Tessellator`].
 public struct Tessellator {
+    @usableFromInline
     var pixels_per_point:  Float32
+    
+    @usableFromInline
     var options: TessellationOptions
+    @usableFromInline
     var font_tex_size: (Int, Int)
 
     /// See [`TextureAtlas::prepared_discs`].
+    @usableFromInline
     var prepared_discs: [PreparedDisc]
 
     /// size of feathering in points. normally the size of a physical pixel. 0.0 if disabled
+     @usableFromInline
     var feathering: Float32
 
     /// Only used for culling
+     @usableFromInline
     var clip_rect: Rect
 
+     @usableFromInline
     var scratchpad_points: [Pos2]
+    
+     @usableFromInline
     var scratchpad_path: Path
+    
+    /// Create a new [`Tessellator`].
+    ///
+    /// * `pixels_per_point`: number of physical pixels to each logical point
+    /// * `options`: tessellation quality
+    /// * `shapes`: what to tessellate
+    /// * `font_tex_size`: size of the font texture. Required to normalize glyph uv rectangles when tessellating text.
+    /// * `prepared_discs`: What [`TextureAtlas::prepared_discs`] returns. Can safely be set to an empty vec.
+ 
+    public init(
+        pixels_per_point: Float32,
+        options: TessellationOptions,
+        font_tex_size: (Int, Int),
+        prepared_discs: [PreparedDisc]
+   ) {
+        let feathering: Float32 = if options.feathering {
+            options.feathering_size_in_pixels * 1.0 / pixels_per_point
+        } else {
+            0.0
+        }
+        self.pixels_per_point = pixels_per_point
+        self.options = options
+        self.font_tex_size = font_tex_size
+        self.prepared_discs = prepared_discs
+        self.feathering = feathering
+        self.clip_rect = .everything
+        self.scratchpad_points = []
+        self.scratchpad_path = .init()
+    }
+}
+
+
+public extension Tessellator {
+    /// Set the `Rect` to use for culling.
+        mutating func setClipRect(_ clipRect: Rect) {
+            self.clip_rect = clipRect
+        }
+
+        /// Round a point to pixel if `roundTextToPixels` is enabled.
+        @inlinable
+        func roundToPixel(_ point: Float) -> Float {
+            if options.round_text_to_pixels {
+                return (point * pixels_per_point).rounded() / pixels_per_point
+            } else {
+                return point
+            }
+        }
+
+//        /// Tessellate a clipped shape into a list of primitives.
+//        mutating func tessellateClippedShape(
+//            _ clippedShape: ClippedShape,
+//            outPrimitives: inout [ClippedPrimitive]
+//        ) {
+//            let clip_rect = clippedShape.clip_rect
+//            let shape = clippedShape.shape
+//
+//            guard clip_rect.isPositive() else {
+//                return
+//            }
+//            
+//            if case .Vec(let shapes) = shape {
+//                for shape in shapes {
+//                    tessellateClippedShape(ClippedShape(clipRect: clipRect, shape: shape), outPrimitives: &outPrimitives)
+//                }
+//                return
+//            }
+//            
+//            if case .Callback(let callback) = shape {
+//                outPrimitives.append(ClippedPrimitive(clipRect: clipRect, primitive: .Callback(callback)))
+//                return
+//            }
+//
+//            let startNewMesh: Bool
+//            if let lastPrimitive = outPrimitives.last {
+//                switch lastPrimitive.primitive {
+//                case .Mesh(let outputMesh):
+//                    startNewMesh = lastPrimitive.clipRect != clipRect || outputMesh.textureId != shape.textureId()
+//                case .Callback:
+//                    startNewMesh = true
+//                }
+//            } else {
+//                startNewMesh = true
+//            }
+//
+//            if startNewMesh {
+//                outPrimitives.append(ClippedPrimitive(clipRect: clipRect, primitive: .Mesh(Mesh())))
+//            }
+//
+//            let out = outPrimitives.last!
+//
+//            if case .Mesh(var outMesh) = out.primitive {
+//                self.clipRect = clipRect
+//                tessellateShape(shape, into: &outMesh)
+//            } else {
+//                fatalError("Unexpected state")
+//            }
+//        }
+    
+    
+    
+    /// Tessellate a single [`CircleShape`] into a [`Mesh`].
+    ///
+    /// * `shape`: the circle to tessellate.
+    /// * `out`: triangles are appended to this.
+    mutating func tessellateCircle(shape: CircleShape, out: inout Mesh) {
+        let center = shape.center
+        let radius = shape.radius
+        var fill = shape.fill
+        let stroke = shape.stroke
+        
+        if radius <= 0.0 {
+            return
+        }
+        
+        if self.options.coarse_tessellation_culling 
+            && !self.clip_rect
+            .expand(by: radius + stroke.width)
+            .contains(center) {
+            return
+        }
+        
+        if self.options.prerasterized_discs && fill != .transparent {
+            let radiusPx = radius * self.pixels_per_point
+            let cutoffRadius = radiusPx * pow(2.0, 0.25)
+            
+            for disc in prepared_discs {
+                if cutoffRadius <= disc.r {
+                    let side = radiusPx * disc.w / (pixels_per_point * disc.r)
+                    let rect = Rect(center: center, size: Vec2(x: side, y: side))
+                    out.addRectWithUv(rect, uv: disc.uv, color: fill)
+                    
+                    if stroke.isEmpty() {
+                        return;
+                    } else {
+                        // we still need to do the stroke
+                        fill = .transparent
+                        break;
+                    }
+                }
+            }
+        }
+        
+        self.scratchpad_path.clear()
+        self.scratchpad_path.addCircle(center: center, radius: radius)
+        self.scratchpad_path.fill(feathering: self.feathering, color: fill, out: &out)
+        self.scratchpad_path.strokeClosed(feathering: self.feathering, stroke: stroke, out: &out)
+    }
+    
+    /// Tessellate a single [`EllipseShape`] into a [`Mesh`].
+    ///
+    /// * `shape`: the ellipse to tessellate.
+    /// * `out`: triangles are appended to this.
+    mutating func tessellate_ellipse(shape: EllipseShape, out: inout Mesh) {
+        let center = shape.center
+        let radius = shape.radius
+        let fill = shape.fill
+    }
+ 
+    
+    
 }

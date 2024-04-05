@@ -1,6 +1,6 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by 蒋艺 on 2024/3/26.
 //
@@ -21,7 +21,7 @@ public enum TextureId: Equatable, Hashable {
     ///
     /// The first texture (`TextureId::Managed(0)`) is used for the font data.
     case managed(UInt64)
-
+    
     /// Your own texture, defined in any which way you want.
     /// The backend renderer will presumably use this to look up what texture to use.
     case user(UInt64)
@@ -35,10 +35,30 @@ public enum TextureId: Equatable, Hashable {
 public struct ClippedShape {
     /// Clip / scissor rectangle.
     /// Only show the part of the [`Shape`] that falls within this.
-public var clip_rect: Rect
-
+    public var clip_rect: Rect
+    
     /// The shape
     public var shape: Shape
-
+    
 }
+
+/// A [`Mesh`] or [`PaintCallback`] within a clip rectangle.
+///
+/// Everything is using logical points.
+public struct ClippedPrimitive {
+    /// Clip / scissor rectangle.
+    /// Only show the part of the [`Mesh`] that falls within this.
+    public var clip_rect: Rect
+
+    /// What to paint - either a [`Mesh`] or a [`PaintCallback`].
+    public var primitive: Primitive
+}
+
+/// A rendering primitive - either a [`Mesh`] or a [`PaintCallback`].
+public enum Primitive {
+    case mesh(Mesh)
+    case callback(PaintCallback)
+}
+
+
 

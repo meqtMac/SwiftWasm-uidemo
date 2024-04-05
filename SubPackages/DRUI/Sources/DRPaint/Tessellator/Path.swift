@@ -187,22 +187,26 @@ public extension Path {
     
     func strokeOpen(feathering: Float, stroke: Stroke, out: inout Mesh) {
         // Implement stroke_path for open path
+        Path.strokePath(feathering: feathering, path: self.points, pathType: .open, stroke: stroke, out: &out)
     }
     
     func strokeClosed(feathering: Float, stroke: Stroke, out: inout Mesh) {
-        // Implement stroke_path for closed path
+        Path.strokePath(feathering: feathering, path: self.points, pathType: .closed, stroke: stroke, out: &out)
     }
     
     func stroke(feathering: Float, pathType: PathType, stroke: Stroke, out: inout Mesh) {
         // Implement stroke_path for path type
+        Path.strokePath(feathering: feathering, path: self.points, pathType: pathType, stroke: stroke, out: &out)
     }
     
     mutating func fill(feathering: Float, color: Color32, out: inout Mesh) {
         // Implement fill_closed_path
+        Path.fillClosedPath(feathering: feathering, path: &self.points, color: color, out: &out)
     }
     
     mutating func fillWithUV(feathering: Float, color: Color32, textureId: TextureId, uvFromPos: (Pos2) -> Pos2, out: inout Mesh) {
         // Implement fill_closed_path_with_uv
+        Path.fillClosedPathWithUv(feathering: feathering, path: &self.points, color: color, textureId: textureId, uv_from_pos: uvFromPos, out: &out)
     }
     
     internal subscript(index: Int) -> PathPoint {
@@ -218,56 +222,107 @@ public extension Path {
 public extension Path {
 
     /// overwrites existing points
-    mutating func roundedRectangle(rect: Rect, rounding: Rounding) {
-        clear()
+    static func roundedRectangle(path: inout [Pos2], rect: Rect, rounding: Rounding) {
+        path.removeAll()
 
         let min = rect.min
         let max = rect.max
+        let r = clampRounding(rounding: rounding, rect: rect)
+        
+        if r == .zero {
+            let min = rect.min
+                        let max = rect.max
+            path.reserveCapacity(4)
+            path.append(Pos2(x: min.x, y: min.y)) // left top
+            path.append(Pos2(x: max.x, y: min.y)) // right top
+            path.append(Pos2(x: max.x, y: max.y)) // right bottom
+            path.append(Pos2(x: min.x, y: max.y)) // left bottom
+        } else {
+            // We need to avoid duplicated vertices, because that leads to visual artifacts later.
+            // Duplicated vertices can happen when one side is all rounding, with no straight edge between.
+            let eps: Float = .ulpOfOne * rect.size().maxElem()
+            
+            addCircleQuadrant(path: &path, center: Pos2(x: max.x - r.se, y: max.y - r.se), radius: r.se, quadrant: 0.0) // south east
+            
+            if rect.width <= r.se + r.sw + eps {
+                path.removeLast() // avoid duplicated vertex
+            }
+            
+            addCircleQuadrant(path: &path, center: Pos2(x: min.x + r.sw, y: max.y - r.sw), radius: r.sw, quadrant: 1.0) // south west
+            
+            if rect.height <= r.sw + r.nw + eps {
+                path.removeLast() // avoid duplicated vertex
+            }
+            
+            addCircleQuadrant(path: &path, center: Pos2(x: min.x + r.nw, y: min.y + r.nw), radius: r.nw, quadrant: 2.0) // north west
+            
+            if rect.width <= r.nw + r.ne + eps {
+                path.removeLast() // avoid duplicated vertex
+            }
+            
+            addCircleQuadrant(path: &path, center: Pos2(x: max.x - r.ne, y: min.y + r.ne), radius: r.ne, quadrant: 3.0) // north east
+            
+            if rect.height <= r.ne + r.se + eps {
+                path.removeLast() // avoid duplicated vertex
+            }
 
-        // let r = clampRounding(rounding, rect)
+        }
+        
+       }
+    
+    /// Add one quadrant of a circle
+    ///
+    /// * quadrant 0: right bottom
+    /// * quadrant 1: left bottom
+    /// * quadrant 2: left top
+    /// * quadrant 3: right top
+    //
+    // Derivation:
+    //
+    // * angle 0 * TAU / 4 = right
+    //   - quadrant 0: right bottom
+    // * angle 1 * TAU / 4 = bottom
+    //   - quadrant 1: left bottom
+    // * angle 2 * TAU / 4 = left
+    //   - quadrant 2: left top
+    // * angle 3 * TAU / 4 = top
+    //   - quadrant 3: right top
+    // * angle 4 * TAU / 4 = right
+    static func addCircleQuadrant(path: inout [Pos2], center: Pos2, radius: Float, quadrant: Float) {
+        // These cutoffs are based on a high-dpi display. TODO: use pixels_per_point here?
+        // same cutoffs as in add_circle
 
-        // if r == Rounding.ZERO {
-        //     self.reserveCapacity(4)
-        //     self.append(Pos2(x: min.x, y: min.y)) // left top
-        //     self.append(Pos2(x: max.x, y: min.y)) // right top
-        //     self.append(Pos2(x: max.x, y: max.y)) // right bottom
-        //     self.append(Pos2(x: min.x, y: max.y)) // left bottom
-        // } else {
-        //     // We need to avoid duplicated vertices, because that leads to visual artifacts later.
-        //     // Duplicated vertices can happen when one side is all rounding, with no straight edge between.
-        //     let eps = Float.ulpOfOne * rect.size().max()!
-
-        //     addCircleQuadrant(&self, Pos2(x: max.x - r.se, y: max.y - r.se), r.se, 0.0) // south east
-
-        //     if rect.width() <= r.se + r.sw + eps {
-        //         self.removeLast() // avoid duplicated vertex
-        //     }
-
-        //     addCircleQuadrant(&self, Pos2(x: min.x + r.sw, y: max.y - r.sw), r.sw, 1.0) // south west
-
-        //     if rect.height() <= r.sw + r.nw + eps {
-        //         self.removeLast() // avoid duplicated vertex
-        //     }
-
-        //     addCircleQuadrant(&self, Pos2(x: min.x + r.nw, y: min.y + r.nw), r.nw, 2.0) // north west
-
-        //     if rect.width() <= r.nw + r.ne + eps {
-        //         self.removeLast() // avoid duplicated vertex
-        //     }
-
-        //     addCircleQuadrant(&self, Pos2(x: max.x - r.ne, y: min.y + r.ne), r.ne, 3.0) // north east
-
-        //     if rect.height() <= r.ne + r.se + eps {
-        //         self.removeLast() // avoid duplicated vertex
-        //     }
+        if radius <= 0.0 {
+            path.append(center)
+        } else if radius <= 2.0 {
+            let offset = Int(quadrant) * 2
+            let quadrantVertices = CIRCLE_8[offset...offset + 2]
+            path.append(contentsOf: quadrantVertices.map { center + radius * $0 })
+        } else if radius <= 5.0 {
+            let offset = Int(quadrant) * 4
+            let quadrantVertices = CIRCLE_16[offset...offset + 4]
+            path.append(contentsOf: quadrantVertices.map { center + radius * $0 })
+        } else if radius < 18.0 {
+            let offset = Int(quadrant) * 8
+            let quadrantVertices = CIRCLE_32[offset...offset + 8]
+            path.append(contentsOf: quadrantVertices.map { center + radius * $0 })
+        } else if radius < 50.0 {
+            let offset = Int(quadrant) * 16
+            let quadrantVertices = CIRCLE_64[offset...offset + 16]
+            path.append(contentsOf: quadrantVertices.map { center + radius * $0 })
+        } else {
+            let offset = Int(quadrant) * 32
+            let quadrantVertices = CIRCLE_128[offset...offset + 32]
+            path.append(contentsOf: quadrantVertices.map { center + radius * $0 })
         }
     }
 
-    internal func clampRounding(rounding: Rounding, rect: Rect) -> Rounding {
+
+    internal static func clampRounding(rounding: Rounding, rect: Rect) -> Rounding {
         let halfWidth = rect.width * 0.5
         let halfHeight = rect.height * 0.5
         let maxCr = min(halfWidth, halfHeight)
-        // round.
+        return rounding.atMost(max: maxCr).atLeast(min: 0.0)
     }
 
     internal static func cwSignedArea(path: [PathPoint]) -> Float64 {
