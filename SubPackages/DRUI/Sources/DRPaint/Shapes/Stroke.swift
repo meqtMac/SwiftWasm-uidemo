@@ -24,7 +24,7 @@ public extension Stroke {
     static let none = Stroke(width: 0, color: .transparent)
     
     /// True if width is zero or color is transparent
-    func isEmpty() -> Bool {
+    func is_empty() -> Bool {
         width <= 0.0 || self.color == .transparent
     }
     

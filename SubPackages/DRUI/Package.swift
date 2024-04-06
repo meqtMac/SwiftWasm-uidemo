@@ -45,7 +45,15 @@ let package = Package(
                 //"DRColorMacroImpl"
             ]
         ),
-        .target(name: "DRMath"),
+        .target(
+            name: "DRMath",
+            dependencies: [
+                "_NumericsShims"
+            ]
+        ),
+       // MARK: - Implementation details
+           .target(name: "_NumericsShims"),
+       
         .target(name: "RefCount"),
         // .target(name: "RustHelper"),
         .testTarget(

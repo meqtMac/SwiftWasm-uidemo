@@ -364,8 +364,8 @@ public extension Path {
                 }
             }
            
-           out.reserveTriangles(3 * n)
-           out.reserveVertices(2 * n)
+           out.reserve_triangles(3 * n)
+           out.reserve_vertices(2 * n)
 
            let colorOuter: Color32 = .transparent
            let idxInner = out.vertices.count
@@ -389,7 +389,7 @@ public extension Path {
                 i0 = i1
             }
        } else {
-            out.reserveTriangles(n)
+            out.reserve_triangles(n)
             let idx = out.vertices.count
 
             out.vertices
@@ -432,8 +432,8 @@ public extension Path {
                 }
             }
 
-            out.reserveTriangles(3 * n)
-            out.reserveVertices(2 * n)
+            out.reserve_triangles(3 * n)
+            out.reserve_vertices(2 * n)
             let colorOuter: Color32 = .transparent
             let idxInner = out.vertices.count
             let idxOuter = idxInner + 1
@@ -457,7 +457,7 @@ public extension Path {
                 i0 = i1
             }
         } else {
-            out.reserveTriangles(n)
+            out.reserve_triangles(n)
             let idx = out.vertices.count
             out.vertices.append(contentsOf: path.map {
                 Vertex(pos: $0.pos, uv: uv_from_pos($0.pos), color: color)
@@ -497,8 +497,8 @@ public extension Path {
                     return
                 }
 
-                out.reserveTriangles(4 * n)
-                out.reserveTriangles(3 * n)
+                out.reserve_triangles(4 * n)
+                out.reserve_triangles(3 * n)
 
                 var i0 = n - 1
                 for i1 in 0..<n {
@@ -523,8 +523,8 @@ public extension Path {
             }
         } else {
             // not anti-aliased:
-            out.reserveTriangles(2 * n)
-            out.reserveTriangles(2 * n)
+            out.reserve_triangles(2 * n)
+            out.reserve_triangles(2 * n)
 
             let lastIndex = if pathType == .closed {
                 n

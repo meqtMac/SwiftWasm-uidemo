@@ -8,7 +8,6 @@
 import Foundation
 import DRColor
 import DRMath
-//import RustHelper
 
 /// An image stored in RAM.
 ///
@@ -127,13 +126,6 @@ public struct ColorImage {
     //                bytes[i4 + 3] = a
     //            }
     //        }
-    
-    //    /// A view of the underlying data as `&mut [u8]`
-    //    #[cfg(feature = "bytemuck")]
-    //    pub fn as_raw_mut(&mut self) -> &mut [u8] {
-    //        bytemuck::cast_slice_mut(&mut self.pixels)
-    //    }
-    
     
     /// Create a new Image from a patch of the current image. This method is especially convenient for screenshotting a part of the app
     /// since `region` can be interpreted as screen coordinates of the entire screenshot if `pixelsPerPoint` is provided for the native application.

@@ -71,7 +71,7 @@ public extension PathShape {
     /// The visual bounding rectangle (includes stroke width)
     @inlinable
     func visual_bounding_rect() -> Rect {
-       if self.fill == .transparent && self.stroke.isEmpty() {
+       if self.fill == .transparent && self.stroke.is_empty() {
             return .nothing
         } else {
             return Rect(points: self.points).expand(by: self.stroke.width / 2.0)

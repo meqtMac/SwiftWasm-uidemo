@@ -48,6 +48,12 @@ extension AllocInfo {
         self.numElements = slice.count
         self.numBytes = MemoryLayout<T>.stride * slice.count
     }
+    
+    public static func from_mesh(mesh: Mesh) -> Self {
+        return Self(slice: mesh.indices) + Self(slice: mesh.vertices)
+    }
+
+
 }
 
 extension AllocInfo {
@@ -188,14 +194,8 @@ extension PaintStats {
             return
         case let .path(pathShape):
             self.shapePath = AllocInfo(slice: pathShape.points)
-        case let .text(textShape):
-            // TODO: text
-            //
-            fatalError()
-        case let .mesh(mesh):
-            //            self.shapeMesh += AllocInfo(slice: )
-            // TODO: mesh
-            fatalError()
+       case let .mesh(mesh):
+            self.shapeMesh += AllocInfo.from_mesh(mesh: mesh)
         case .callback(_):
             self.numCallbacks += 1
         }

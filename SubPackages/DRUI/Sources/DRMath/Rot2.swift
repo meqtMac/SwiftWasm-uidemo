@@ -6,7 +6,6 @@
 //
 // MARK: Checked
 
-import Foundation
 
 /// Represents a rotation in the 2D plane.
 ///
@@ -32,8 +31,8 @@ public struct Rot2 {
     /// A 𝞃/4 = 90° rotation means rotating the X axis to the Y axis.
    @inlinable
     public init(angle: Float32) {
-        self.s = sin(angle)
-        self.c = cos(angle)
+        self.s = angle.sin()
+        self.c = angle.cos()
     }
     
     
@@ -46,13 +45,14 @@ public extension Rot2 {
     
     @inlinable
     func angle() -> Float {
-        return atan2(self.s, self.c)
+//        return atan2(self.s, self.c)
+        self.s.atan2(self.c)
     }
     
     /// The factor by which vectors will be scaled.
     @inlinable
     func length() -> Float {
-        return hypot(self.c, self.s)
+        c.hypot(s)
     }
     
     func lengthSquared() -> Float {

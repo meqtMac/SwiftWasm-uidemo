@@ -81,9 +81,9 @@ where T: FloatingPoint & ExpressibleByIntegerLiteral {
 }
 
 /// Round a value to the given number of decimal places.
-public func roundToDecimals(_ value: Float32, _ decimalPlaces: Int) -> Float32 {
-    return Float32(String(format: "%.\(decimalPlaces)f", value)) ?? value
-}
+//public func roundToDecimals(_ value: Float32, _ decimalPlaces: Int) -> Float32 {
+//    return Float32(String(format: "%.\(decimalPlaces)f", value)) ?? value
+//}
 
 public func formatWithMinimumDecimals(_ value: Float32, _ decimals: Int) -> String {
     return formatWithDecimalsInRange(value, decimals...6)
@@ -124,68 +124,7 @@ public func almostEqual(_ a: Float32, _ b: Float32, epsilon: Float32) -> Bool {
     }
 }
 
-/// Restrict a value to a certain interval unless it is NaN.
-///
-/// Returns `max` if `self` is greater than `max`, and `min` if `self` is
-/// less than `min`. Otherwise this returns `self`.
-///
-/// Note that this function returns NaN if the initial value was NaN as
-/// well.
-///
-/// # Panics
-///
-/// Panics if `min > max`, `min` is NaN, or `max` is NaN.
-///
-/// # Examples
-///
-/// ```
-/// assert!((-3.0f32).clamp(-2.0, 1.0) == -2.0);
-/// assert!((0.0f32).clamp(-2.0, 1.0) == 0.0);
-/// assert!((2.0f32).clamp(-2.0, 1.0) == 1.0);
-/// assert!((f32::NAN).clamp(-2.0, 1.0).is_nan());
-/// ```
-public extension FloatingPoint {
-    
-    @inlinable
-    func clamped(min: Self, max: Self) -> Self {
-        assert(min <= max, "min > max, or either was NaN. min = {min:?}, max = {max:?}");
-        var new = self
-        if self < min {
-            new = min
-        } else if self > max {
-            new = max
-        }
-        return new
-    }
-    
-    @inlinable
-    mutating func clamp(min: Self, max: Self) {
-        assert(min <= max, "min > max, or either was NaN. min = {min:?}, max = {max:?}");
-        if self < min {
-            self = min
-        } else if self > max {
-            self = max
-        }
-    }
-    
-    @inlinable
-    func max(_ other: Self) -> Self {
-        return Swift.max(self, other)
-    }
-    
-    @inlinable
-    func min(_ other: Self) -> Self {
-        return Swift.min(self, other)
-    }
-    
-    @inlinable
-    func cbrt() -> Self {
-        return 
-    }
 
-
-    
-}
 
 /// Calculate a lerp-factor for exponential smoothing using a time step.
 ///
@@ -195,7 +134,7 @@ public extension FloatingPoint {
 ///   - dt: The time step.
 /// - Returns: The lerp-factor.
 public func exponentialSmoothFactor(reachThisFraction: Float, inThisManySeconds: Float, dt: Float) -> Float {
-    return 1.0 - pow(1.0 - reachThisFraction, dt / inThisManySeconds)
+    return 1.0 - (1.0 - reachThisFraction).pow(dt / inThisManySeconds)
 }
 
 /// If you have a value animating over time,

@@ -8,8 +8,6 @@
 // MARK: Checked
 // TODO: Testing
 
-import Foundation
-
 /// A vector has a direction and length.
 /// A `Vec2` is often used to represent a size.
 ///
@@ -113,7 +111,7 @@ public extension Vec2 {
     
     @inline(__always)
     func length() -> Float {
-        hypot(x, y)
+        x.hypot(y)
     }
     
     @inline(__always)
@@ -124,7 +122,7 @@ public extension Vec2 {
     /// Measures the angle of the vector.
     @inline(__always)
     func angle() -> Float {
-        atan2(y, x)
+        x.atan2(y)
     }
     
     /// Create a unit vector with the given CW angle (in radians).
@@ -132,13 +130,13 @@ public extension Vec2 {
     /// * An angle of TAU/4 = 90° gives the unit Y axis.
     @inline(__always)
     static func angled(angle: Float) -> Vec2 {
-        return Vec2(x: cos(angle), y: sin(angle))
+        return Vec2(x: angle.cos(), y: angle.sin())
     }
     
     // FIXME: platform dependent impl
     @inline(__always)
     func floored() -> Vec2 {
-        Vec2(x: x.rounded(.down), y: y.rounded(.down))
+        Vec2(x: x.floor(), y: y.floor())
     }
     
     @inline(__always)
@@ -148,12 +146,12 @@ public extension Vec2 {
     
     @inline(__always)
     func ceiled() -> Vec2 {
-        Vec2(x: x.rounded(.up), y: y.rounded(.up))
+        Vec2(x: x.ceil(), y: y.ceil())
     }
     
     @inline(__always)
     func absoluted() -> Vec2 {
-        Vec2(x: abs(x), y: abs(y))
+        Vec2(x: x.abs(), y: y.abs())
     }
     
     /// True if all members are also finite.
@@ -168,19 +166,7 @@ public extension Vec2 {
     }
     
     
-    //    #[must_use]
-    //    #[inline]
-    //    pub fn min(self, other: Self) -> Self {
-    //        vec2(self.x.min(other.x), self.y.min(other.y))
-    //    }
-    //
-    //    #[must_use]
-    //    #[inline]
-    //    pub fn max(self, other: Self) -> Self {
-    //        vec2(self.x.max(other.x), self.y.max(other.y))
-    //    }
-    
-    @inline(__always)
+   @inline(__always)
     func min(_ other: Self) -> Self {
         Vec2(x: Swift.min(x, other.x), y: Swift.min(y, other.y))
     }

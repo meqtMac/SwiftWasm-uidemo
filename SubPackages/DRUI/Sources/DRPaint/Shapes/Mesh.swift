@@ -139,13 +139,13 @@ public extension Mesh {
        
     /// Reserves space for additional triangles (3x as many indices).
      @inlinable
-     mutating func reserveTriangles(_ additionalTriangles: Int) {
+     mutating func reserve_triangles(_ additionalTriangles: Int) {
          indices.reserveCapacity(additionalTriangles * 3)
      }
     
     /// Reserves space for additional vertices.
     @inlinable
-    mutating func reserveVertices(_ additional: Int) {
+    mutating func reserve_vertices(_ additional: Int) {
         vertices.reserveCapacity(additional)
     }
     

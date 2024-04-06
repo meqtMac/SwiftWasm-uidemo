@@ -7,7 +7,6 @@
 
 // MARK: Checked
 
-import Foundation
 
 let NUM_DECIMALS: Int = 15
 
@@ -43,23 +42,23 @@ public func bestInRange(min: Double, max: Double) -> Double {
         return min
     }
     
-    let minExponent = log10(min)
-    let maxExponent = log10(max)
+    let minExponent = min.log10()
+    let maxExponent = max.log10()
     
     if minExponent.rounded(.down) != maxExponent.rounded(.down) {
         // pick the geometric center of the two:
         let exponent = (minExponent + maxExponent) / 2.0
-        return pow(10.0, exponent.rounded() as Double)
+        return 10.0.pow(exponent.rounded())
     }
     
     if minExponent.rounded() == minExponent {
-        return pow(10.0, minExponent)
+        return 10.0.pow(minExponent)
     }
     if maxExponent.rounded() == maxExponent {
-        return pow(10.0, maxExponent)
+        return 10.0.pow(maxExponent)
     }
     
-    let expFactor = pow(10.0, maxExponent.rounded(.down))
+    let expFactor = 10.0.pow(maxExponent.floor())
     
     let minStr = toDecimalString(v: min / expFactor)
     let maxStr = toDecimalString(v: max / expFactor)
@@ -102,7 +101,7 @@ fileprivate func toDecimalString(v: Float64) -> [Int] {
 fileprivate func fromDecimalString(s: [Int]) -> Float64 {
     var ret: Float64 = 0.0
     for (i, digit) in s.enumerated() {
-        ret += Float64(digit) * pow(10.0, -Double((i)))
+        ret += Float64(digit) * 10.0.pow(-Double(i))
     }
     return ret
 }
