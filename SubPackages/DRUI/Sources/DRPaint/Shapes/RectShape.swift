@@ -22,6 +22,15 @@ public struct RectShape {
     /// The thickness and color of the outline.
     public var stroke: Stroke
 
+    /// If larger than zero, the edges of the rectangle
+    /// (for both fill and stroke) will be blurred.
+    ///
+    /// This can be used to produce shadows and glow effects.
+    ///
+    /// The blur is currently implemented using a simple linear blur in sRGBA gamma space.
+    public var blur_width: Float32
+
+
     /// If the rect should be filled with a texture, which one?
     ///
     /// The texture is multiplied with [`Self::fill`].

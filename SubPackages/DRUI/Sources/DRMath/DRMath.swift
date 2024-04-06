@@ -178,6 +178,13 @@ public extension FloatingPoint {
         return Swift.min(self, other)
     }
     
+    @inlinable
+    func cbrt() -> Self {
+        return 
+    }
+
+
+    
 }
 
 /// Calculate a lerp-factor for exponential smoothing using a time step.

@@ -18,6 +18,7 @@ let package = Package(
        // WASI not support macro yet
         // Depend on the Swift 5.9 release of SwiftSyntax
 //        .package(url: "https://github.com/apple/swift-syntax.git", from: "509.0.0"),
+        .package(url: "https://github.com/nicklockwood/SwiftFormat.git", from: "0.35.8"),
     ],
     targets: [
        .target(
@@ -39,19 +40,14 @@ let package = Package(
         .target(
             name: "DRColor",
             dependencies: [
-                "RustHelper",
+                // "RustHelper",
                 // WASI not support macro yet
                 //"DRColorMacroImpl"
             ]
         ),
-        .target(
-            name: "DRMath",
-            dependencies: [
-                "RustHelper"
-            ]
-        ),
+        .target(name: "DRMath"),
         .target(name: "RefCount"),
-        .target(name: "RustHelper"),
+        // .target(name: "RustHelper"),
         .testTarget(
             name: "DRColorTest",
             dependencies: [

@@ -65,7 +65,7 @@ public extension Rect {
                                 max: Pos2(x: Float.nan, y: Float.nan))
     
     /// A `Rect` filled with zeroes.
-    static let ZERO: Rect = Rect(min: .zero, max: .zero)
+    static let zero: Rect = Rect(min: .zero, max: .zero)
 }
 
 public extension Rect {
