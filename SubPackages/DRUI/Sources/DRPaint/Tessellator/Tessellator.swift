@@ -105,7 +105,6 @@ public struct Tessellator {
     /// * `shapes`: what to tessellate
     /// * `font_tex_size`: size of the font texture. Required to normalize glyph uv rectangles when tessellating text.
     /// * `prepared_discs`: What [`TextureAtlas::prepared_discs`] returns. Can safely be set to an empty vec.
-    
     public init(
         pixels_per_point: Float32,
         options: TessellationOptions,
@@ -136,7 +135,7 @@ public extension Tessellator {
     }
     
     /// Round a point to pixel if `roundTextToPixels` is enabled.
-    @inlinable
+    @inline(__always)
     func roundToPixel(_ point: Float) -> Float {
         if options.round_text_to_pixels {
             return (point * pixels_per_point).rounded() / pixels_per_point
@@ -145,63 +144,125 @@ public extension Tessellator {
         }
     }
     
-    //        /// Tessellate a clipped shape into a list of primitives.
-    //        mutating func tessellateClippedShape(
-    //            _ clippedShape: ClippedShape,
-    //            outPrimitives: inout [ClippedPrimitive]
-    //        ) {
-    //            let clip_rect = clippedShape.clip_rect
-    //            let shape = clippedShape.shape
-    //
-    //            guard clip_rect.isPositive() else {
-    //                return
-    //            }
-    //
-    //            if case .Vec(let shapes) = shape {
-    //                for shape in shapes {
-    //                    tessellateClippedShape(ClippedShape(clipRect: clipRect, shape: shape), outPrimitives: &outPrimitives)
-    //                }
-    //                return
-    //            }
-    //
-    //            if case .Callback(let callback) = shape {
-    //                outPrimitives.append(ClippedPrimitive(clipRect: clipRect, primitive: .Callback(callback)))
-    //                return
-    //            }
-    //
-    //            let startNewMesh: Bool
-    //            if let lastPrimitive = outPrimitives.last {
-    //                switch lastPrimitive.primitive {
-    //                case .Mesh(let outputMesh):
-    //                    startNewMesh = lastPrimitive.clipRect != clipRect || outputMesh.textureId != shape.textureId()
-    //                case .Callback:
-    //                    startNewMesh = true
-    //                }
-    //            } else {
-    //                startNewMesh = true
-    //            }
-    //
-    //            if startNewMesh {
-    //                outPrimitives.append(ClippedPrimitive(clipRect: clipRect, primitive: .Mesh(Mesh())))
-    //            }
-    //
-    //            let out = outPrimitives.last!
-    //
-    //            if case .Mesh(var outMesh) = out.primitive {
-    //                self.clipRect = clipRect
-    //                tessellateShape(shape, into: &outMesh)
-    //            } else {
-    //                fatalError("Unexpected state")
-    //            }
-    //        }
+    /// Tessellate a clipped shape into a list of primitives.
+    mutating func tessellateClippedShape(
+        _ clippedShape: ClippedShape,
+        outPrimitives: inout [ClippedPrimitive]
+    ) {
+        let clip_rect = clippedShape.clip_rect
+        let shape = clippedShape.shape
+        
+        guard clip_rect.isPositive() else {
+            return
+        }
+        
+        if case let .vec(vec_shapes) = shape {
+            for vec_shape in vec_shapes {
+                tessellateClippedShape(.init(clip_rect: clip_rect, shape: vec_shape), outPrimitives: &outPrimitives)
+            }
+            return
+        }
+        
+        if case let .callback(callback) = shape {
+            outPrimitives.append(
+                .init(
+                    clip_rect: clip_rect,
+                    primitive: .callback(callback)
+                )
+            )
+        }
+        
+        let startNewMesh: Bool
+        if let lastPrimitive = outPrimitives.last {
+            let tmp: Bool
+            switch lastPrimitive.primitive {
+            case .mesh(let outputMesh):
+                tmp = outputMesh.texture_id != shape.texture_id()
+            case .callback(_):
+                tmp = true
+            }
+            startNewMesh = (lastPrimitive.clip_rect != clip_rect) || tmp
+        } else {
+            startNewMesh = true
+        }
+        
+        if startNewMesh {
+            outPrimitives.append(.init(clip_rect: clip_rect, primitive: .mesh(Mesh(texture_id: .default))))
+        }
+        
+        //                let out =outPrimitives.last
+        ////                out_primitives.last_mut().unwrap();
+        //
+        //                if let Primitive::Mesh(out_mesh) = &mut out.primitive {
+        //                    self.clip_rect = clip_rect;
+        //                    self.tessellate_shape(shape, out_mesh);
+        //                } else {
+        //                    unreachable!();
+        //                }
+        //        if let last = outPrimitives.last {
+        if case let .mesh(mesh) = outPrimitives.last?.primitive {
+            self.clip_rect = clip_rect
+            var mesh = mesh
+            self.tessellate_shape(shape: shape, out: &mesh)
+            outPrimitives[outPrimitives.endIndex].primitive = .mesh(mesh)
+        }
+        else {
+            fatalError("Un reachable")
+        }
+        
+    }
     
+    /// Tessellate a single [`Shape`] into a [`Mesh`].
+    ///
+    /// This call can panic the given shape is of [`Shape::Vec`] or [`Shape::Callback`].
+    /// For that, use [`Self::tessellate_clipped_shape`] instead.
+    /// * `shape`: the shape to tessellate.
+    /// * `out`: triangles are appended to this.
+    mutating func tessellate_shape(shape: Shape, out: inout Mesh) {
+        switch shape {
+        case .noop:
+            break;
+        case let .vec(vec):
+            for shape in vec {
+                self.tessellate_shape(shape: shape, out: &out);
+            }
+        case let .circle(circle):
+            self.tessellate_circle(shape: circle, out: &out);
+        case let .ellipse(ellipse):
+            self.tessellate_ellipse(shape: ellipse, out: &out);
+        case let .mesh(mesh):
+            if self.options.validate_meshes && !mesh.isValid() {
+                assertionFailure("Invalid Mesh in Shape::Mesh")
+                return;
+            }
+            if self.options.coarse_tessellation_culling
+                && !self.clip_rect.intersects(mesh.calcBounds())
+            {
+                return;
+            }
+            out.append(mesh);
+        case let .lineSegment(points, stroke):
+            self.tessellate_line(points: points, stroke: stroke, out: &out)
+        case let .path(path_shape):
+            self.tessellate_path(path_shape: path_shape, out: &out)
+        case let .rect(rect_shape):
+            self.tessllate_rect(rect: rect_shape, out: &out)
+        case let .quadraticBezier(quadratic_shape):
+            self.tessellate_quadratic_bezier(quadratic_shape: quadratic_shape, out: &out)
+        case let .cubicBezier(cubic_shape):
+            self.tessellate_cubic_bezier(cubic_shape: cubic_shape, out: &out)
+            // MARK: - TODO
+        case .callback:
+            fatalError("Shape::Callback passed to Tessellator")
+        }
+    }
     
     
     /// Tessellate a single [`CircleShape`] into a [`Mesh`].
     ///
     /// * `shape`: the circle to tessellate.
     /// * `out`: triangles are appended to this.
-    mutating func tessellateCircle(shape: CircleShape, out: inout Mesh) {
+    mutating func tessellate_circle(shape: CircleShape, out: inout Mesh) {
         let center = shape.center
         let radius = shape.radius
         var fill = shape.fill
@@ -509,13 +570,13 @@ public extension Tessellator {
         self.feathering = old_feathering
     }
     
-    /// Tessellate a single [`TextShape`] into a [`Mesh`].
-    /// * `text_shape`: the text to tessellate.
-    /// * `out`: triangles are appended to this.
-    mutating func tessellate_text(text_shape: TextShape, out: inout Mesh) {
-        // TODO: implementation
-        fatalError("To be implemented \(#file) \(#line)")
-    }
+    //    /// Tessellate a single [`TextShape`] into a [`Mesh`].
+    //    /// * `text_shape`: the text to tessellate.
+    //    /// * `out`: triangles are appended to this.
+    //    mutating func tessellate_text(text_shape: TextShape, out: inout Mesh) {
+    //        // TODO: implementation
+    //        fatalError("To be implemented \(#file) \(#line)")
+    //    }
     
     /// Tessellate a single [`QuadraticBezierShape`] into a [`Mesh`].
     ///
@@ -528,28 +589,154 @@ public extension Tessellator {
         let options = self.options;
         let clip_rect = self.clip_rect;
         
-        // if options.coarse_tessellation_culling
-        //     && !quadratic_shape
-        //     // .visual_bounding_rect.intersects(clip_rect)
-        // {
-        //     return;
-        // }
+        if options.coarse_tessellation_culling && !quadratic_shape.visual_bounding_rect().intersects(clip_rect) {
+            return
+        }
+        
+        let points = quadratic_shape.flatten(tolerance: options.bezier_tolerance)
         
         // let points = quadratic_shape.flatten(Some(options.bezier_tolerance));
+        self.tessellate_bezier_complete(points: points, fill: quadratic_shape.fill, closed: quadratic_shape.closed, stroke: quadratic_shape.stroke, out: &out)
+    }
+    
+    /// Tessellate a single [`CubicBezierShape`] into a [`Mesh`].
+    ///
+    /// * `cubic_shape`: the shape to tessellate.
+    /// * `out`: triangles are appended to this.
+    mutating func tessellate_cubic_bezier(cubic_shape: CubicBezierShape, out: inout Mesh) {
+        let options = self.options;
+        let clip_rect = self.clip_rect;
+        if options.coarse_tessellation_culling
+            && !cubic_shape.visual_bounding_rect().intersects(clip_rect)
+        {
+            return;
+        }
         
-        // self.tessellate_bezier_complete(
-        //     &points,
-        //     quadratic_shape.fill,
-        //     quadratic_shape.closed,
-        //     quadratic_shape.stroke,
-        //     out,
-        // );
+        let points_vec =
+        cubic_shape.flatten_closed(options.bezier_tolerance, options.epsilon)
+        
+        for points in points_vec {
+            self.tessellate_bezier_complete(
+                points: points,
+                fill: cubic_shape.fill,
+                closed: cubic_shape.closed,
+                stroke: cubic_shape.stroke,
+                out: &out)
+        }
+    }
+    
+    internal mutating func tessellate_bezier_complete(
+        points: consuming [Pos2],
+        fill: Color32,
+        closed: Bool,
+        stroke: Stroke,
+        out: inout Mesh
+    ) {
+        if points.count < 2 {
+            return;
+        }
+        
+        self.scratchpad_path.clear();
+        if closed {
+            self.scratchpad_path.addLineLoop(points: points)
+        } else {
+            self.scratchpad_path.addOpenPoints(points: points)
+        }
+        if fill != .transparent {
+            assert(closed, "You asked to fill a path that is not closed. That makes no sense.")
+            self.scratchpad_path.fill(feathering: feathering, color: fill, out: &out)
+        }
+        
+        let typ: PathType = if closed {
+            .closed
+        } else {
+            .open
+        }
+        self.scratchpad_path
+            .stroke(feathering: self.feathering, pathType: typ, stroke: stroke, out: &out)
     }
     
 }
 
+extension Tessellator {
+    /// Turns [`Shape`]:s into sets of triangles.
+    ///
+    /// The given shapes will tessellated in the same order as they are given.
+    /// They will be batched together by clip rectangle.
+    ///
+    /// * `pixels_per_point`: number of physical pixels to each logical point
+    /// * `options`: tessellation quality
+    /// * `shapes`: what to tessellate
+    /// * `font_tex_size`: size of the font texture. Required to normalize glyph uv rectangles when tessellating text.
+    /// * `prepared_discs`: What [`TextureAtlas::prepared_discs`] returns. Can safely be set to an empty vec.
+    ///
+    /// The implementation uses a [`Tessellator`].
+    ///
+    /// ## Returns
+    /// A list of clip rectangles with matching [`Mesh`].
+    public mutating func tessellate_shapes(shapes: inout [ClippedShape]) -> [ClippedPrimitive] {
+        var clipped_primitives: [ClippedPrimitive] = []
+        
+        {
+            for clipped_shape in shapes {
+                self.tessellateClippedShape(clipped_shape, outPrimitives: &clipped_primitives)
+            }
+        }()
+        
+        if self.options.debug_paint_clip_rects {
+            clipped_primitives = self.add_clip_rects(clipped_primitives: clipped_primitives);
+        }
+        
+        if self.options.debug_ignore_clip_rects {
+            for index in clipped_primitives.indices {
+                clipped_primitives[index].clip_rect = .everything
+            }
+        }
+        
+        
+        clipped_primitives.removeAll { p in
+            let tmp: Bool = switch p.primitive {
+            case .mesh(let mesh):
+                mesh.isEmpty()
+            case .callback:
+                false
+            }
+            return !p.clip_rect.isPositive() || tmp
+        }
+        
+        for clipped_primitive in clipped_primitives {
+            if case let .mesh(mesh) = clipped_primitive.primitive {
+                assert(mesh.isValid(), "Tessellator generated invalid Mesh")
+            }
+        }
+        return clipped_primitives
+    }
+    
+    internal mutating func add_clip_rects(clipped_primitives: [ClippedPrimitive]) -> [ClippedPrimitive] {
+        self.clip_rect = .everything
+        let stroke = Stroke(width: 2.0, color: Color32(r: 150, g: 255, b: 150, a: 255))
+        
+        return clipped_primitives
+            .flatMap { clipped_primitive in
+                var clip_rect_mesh = Mesh(texture_id: .default)
+                self.tessellate_shape(
+                    shape: .rect_stroke(rect: clipped_primitive.clip_rect, rounding: .zero, stroke: stroke),
+                    out: &clip_rect_mesh)
+                
+                return [
+                    clipped_primitive,
+                    ClippedPrimitive(
+                        clip_rect: .everything, // whatever
+                        primitive: .mesh(clip_rect_mesh)
+                    )
+                ]
+            }
+        
+    }
+    
+}
 
-func cw_signed_area(path: [PathPoint]) -> Float64 {
+fileprivate func cw_signed_area(path: [PathPoint]) -> Float64 {
     if let last = path.last {
         var previous = last.pos;
         var area = 0.0;
@@ -568,7 +755,7 @@ func cw_signed_area(path: [PathPoint]) -> Float64 {
 /// Calling this may reverse the vertices in the path if they are wrong winding order.
 ///
 /// The preferred winding order is clockwise.
-func fill_closed_path(feathering: Float32, path: inout [PathPoint], color: Color32, out: inout Mesh) {
+fileprivate func fill_closed_path(feathering: Float32, path: inout [PathPoint], color: Color32, out: inout Mesh) {
     if color == .transparent {
         return;
     }
@@ -624,7 +811,7 @@ func fill_closed_path(feathering: Float32, path: inout [PathPoint], color: Color
 /// Like [`fill_closed_path`] but with texturing.
 ///
 /// The `uv_from_pos` is called for each vertex position.
-func fill_closed_path_with_uv(
+fileprivate func fill_closed_path_with_uv(
     feathering: Float32,
     path: inout [PathPoint],
     color: Color32,
@@ -709,7 +896,7 @@ func fill_closed_path_with_uv(
 }
 
 /// Tessellate the given path as a stroke with thickness.
-func stroke_path(
+fileprivate func stroke_path(
     feathering: Float32,
     path: [PathPoint],
     path_type: PathType,
@@ -752,7 +939,6 @@ func stroke_path(
                 let p1 = path[Int(i1)];
                 let p = p1.pos;
                 let n = p1.normal;
-                //                out.coloredVertex(pos: <#T##Pos2#>, color: <#T##Color32#>)
                 out.coloredVertex(pos: p + n * feathering, color: color_outer);
                 out.coloredVertex(pos: p, color: color_inner);
                 out.coloredVertex(pos: p - n * feathering, color: color_outer);
@@ -936,7 +1122,8 @@ func stroke_path(
     }
 }
 
-func mul_color(color: Color32, factor: Float32) -> Color32 {
+@inlinable
+internal func mul_color(color: Color32, factor: Float32) -> Color32 {
     // The fast gamma-space multiply also happens to be perceptually better.
     // Win-win!
     color.gammaMultiply(factor: factor)

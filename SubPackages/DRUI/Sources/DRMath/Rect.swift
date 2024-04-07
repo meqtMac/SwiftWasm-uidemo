@@ -22,7 +22,7 @@
 /// `Rect` does NOT implement `Default`, because there is no obvious default value.
 /// `Rect.ZERO` may seem reasonable, but when used as a bounding box, `Rect.nothing`
 /// is a better default - so be explicit instead!
-public struct Rect {
+public struct Rect: Equatable {
     /// One of the corners of the rectangle, usually the left top one.
     @inline(__always)
     public var min: Pos2

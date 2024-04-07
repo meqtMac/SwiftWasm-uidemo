@@ -284,7 +284,7 @@ public extension Shape {
             return rect
         case .circle(let shape):
             return shape.visual_bounding_rect()
-        case var .ellipse(ellipse_shape):
+        case let .ellipse(ellipse_shape):
             return ellipse_shape.visual_bounding_rect()
         case let .lineSegment(points, stroke):
             if stroke.is_empty() {

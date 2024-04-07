@@ -58,12 +58,10 @@ public extension Shadow {
         let color = self.color
         
         let rect = rect.translated(by: offset).expand(by: spread)
-//        rect.translate(offset).expand(spread);
-//        let rounding = rounding.into() + Rounding::same(spread.abs());
         let rounding = rounding + Rounding.same(radius: spread.abs())
 
-//        RectShape::filled(rect, rounding, color).with_blur_width(blur)
         return RectShape.filled(rect: rect, rounding: rounding, fill_color: color)
+            .with_blur_width(blur)
     }
 
     /// How much larger than the parent rect are we in each direction?
