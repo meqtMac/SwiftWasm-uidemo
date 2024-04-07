@@ -626,7 +626,7 @@ public extension Tessellator {
     }
     
     internal mutating func tessellate_bezier_complete(
-        points: consuming [Pos2],
+        points: [Pos2],
         fill: Color32,
         closed: Bool,
         stroke: Stroke,
