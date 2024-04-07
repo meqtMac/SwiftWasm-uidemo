@@ -26,13 +26,30 @@ public struct PaintCallbackInfo {
     public var pixels_per_point: Float32
 
     /// Full size of the screen, in pixels.
-    public var screen_size_px: (Int32, Int32)
+    public var screen_size_px: (UInt32, UInt32)
+    
+    public init(viewport: Rect, clip_rect: Rect, pixels_per_point: Float32, screen_size_px: (UInt32, UInt32)) {
+        self.viewport = viewport
+        self.clip_rect = clip_rect
+        self.pixels_per_point = pixels_per_point
+        self.screen_size_px = screen_size_px
+    }
 }
 
-public extension PaintCallbackInfo {
+extension PaintCallbackInfo {
     // TODO: -
     // view_port_in_pixels
     // clip_rect_in_pixels
+    /// The viewport rectangle. This is what you would use in e.g. `glViewport`.
+    public func viewport_in_pixels() -> ViewportInPixels {
+        ViewportInPixels.from_points(rect: self.viewport, pixels_per_point: self.pixels_per_point, screen_size_px: self.screen_size_px)
+    }
+
+    /// The "scissor" or "clip" rectangle. This is what you would use in e.g. `glScissor`.
+    public func clip_rect_in_pixels() -> ViewportInPixels {
+        ViewportInPixels.from_points(rect: self.clip_rect, pixels_per_point: self.pixels_per_point, screen_size_px: self.screen_size_px)
+    }
+
 }
 
 /// If you want to paint some 3D shapes inside an egui region, you can use this.
