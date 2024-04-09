@@ -18,7 +18,8 @@ public extension RectView {
         context.save()
 //        context.setFillStyle(backgroundColor)
         context.set(background: backgroundColor)
-        context.fill(rect: self.frame)
+//        context.fill(rect: self.frame)
+        context.fillRect(x: frame.left, y: frame.top, w: frame.width, h: frame.height)
         context.restore()
     }
 }

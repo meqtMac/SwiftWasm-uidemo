@@ -26,7 +26,7 @@ public typealias Context2D = DOM.CanvasRenderingContext2D
 
 public extension Context2D {
     func set(background color: Color32) {
-        let jsColor = JSColor.rgba(color.r, color.g, color.b, Double(color.a) / 255.0)
-        setFillStyle(jsColor)
+//        let jsColor = JSColor.rgba(color.r, color.g, color.b, Double(color.a) / 255.0)
+//        setFillStyle(jsColor)
     }
 }

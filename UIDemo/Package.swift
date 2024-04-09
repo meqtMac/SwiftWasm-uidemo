@@ -34,11 +34,15 @@ let package = Package(
             url: "https://github.com/swiftwasm/carton",
             from: "1.0.0"
         ),
-        // local web api kit dependency
+//        // local web api kit dependency
+//        .package(
+//            name: "WebAPIKit",
+//            path: "../SubPackages/WebAPIKit"
+//        ),
+        // use WebAPIKit fork
         .package(
-            name: "WebAPIKit",
-            path: "../SubPackages/WebAPIKit"
-        ),
+            url: "https://github.com/meqtMac/WebAPIKit.git",
+            branch: "feature/meqtjiang-drui"),
         .package(
             name: "DRUI",
             path: "../SubPackages/DRUI"

@@ -37,10 +37,12 @@ internal struct RootView: DRView {
         context.imageSmoothingEnabled = false
         self.frame = CGRect(origin: .zero, size: CGSize(width: CGFloat(context.canvas.width), height: CGFloat(context.canvas.height)))
         
-        context.clear(rect: frame)
+//        context.clear(rect: frame)
+        context.clearRect(x: frame.left, y: frame.top, w: frame.width, h: frame.height)
         context.save()
         context.set(background: backgroundColor)
-        context.fill(rect: frame)
+//        context.fill(rect: frame)
+        context.fillRect(x: frame.left, y: frame.top, w: frame.width, h: frame.height)
         context.restore()
         
         drawSubviews(on: context)

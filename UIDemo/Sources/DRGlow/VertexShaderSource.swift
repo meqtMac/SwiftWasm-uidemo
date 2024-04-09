@@ -11,26 +11,20 @@ internal let aTc  = "a_tc"
 
 internal let vertexShaderSource =
 """
-#if NEW_SHADER_INTERFACE
-    #define I in
-    #define O out
-    #define V(x) x
-#else
-    #define I attribute
-    #define O varying
-    #define V(x) vec3(x)
-#endif
+#version 300 es
+
+#define V(x) x
 
 #ifdef GL_ES
     precision mediump float;
 #endif
 
 uniform vec2 \(uScreenSize);
-I vec2 \(aPos);
-I vec4 \(attributeColor); // 0-255 sRGB
-I vec2 \(aTc);
-O vec4 v_rgba_in_gamma;
-O vec2 v_tc;
+in vec2 \(aPos);
+in vec4 \(attributeColor); // 0-255 sRGB
+in vec2 \(aTc);
+out vec4 v_rgba_in_gamma;
+out vec2 v_tc;
 
 void main() {
     gl_Position = vec4(

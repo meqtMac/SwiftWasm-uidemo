@@ -112,13 +112,13 @@ struct SettingCell: DRView {
     
     func draw(on context: Context2D) {
         context.save()
-        context.setFillStyle(.rgba(0, 0, 0, 0.1))
-        context.fill(rect: self.frame)
+//        context.setFillStyle(.rgba(0, 0, 0, 0.1))
+//        context.fill(rect: self.frame)
         context.restore()
         
         context.save()
         context.font = "50px Arial"
-        context.fill(text, x: 0 + self.left, y: 40 + self.top )
+//        context.fill(text, x: 0 + self.left, y: 40 + self.top )
         context.restore()
     }
     

@@ -98,6 +98,15 @@
         "revision" : "d04b31f61b6f528a9a96ebfe4fa4275e333eba82",
         "version" : "0.5.0"
       }
+    },
+    {
+      "identity" : "webapikit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/meqtMac/WebAPIKit.git",
+      "state" : {
+        "branch" : "feature/meqtjiang-drui",
+        "revision" : "8508bf2e0d0c743869383384589c20db7d62d14a"
+      }
     }
   ],
   "version" : 2

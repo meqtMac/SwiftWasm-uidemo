@@ -66,11 +66,11 @@ struct DeviceLabelView: DRView {
         context.save()
         context.font = "16px Arial"
         let device = viewModel.device
-        context.fill(device.name, x: 0, y: 16)
-        context.fill(device.statusBarHeight.description, x: 0, y: 32)
-        context.fill("\(device.size)", x: 0, y: 48)
-        context.fill(device.safeAreaBottom.description, x: 0, y: 64)
-        context.fill(device.uiSizeClass.rawValue, x: 0, y: 80)
+//        context.fill(device.name, x: 0, y: 16)
+//        context.fill(device.statusBarHeight.description, x: 0, y: 32)
+//        context.fill("\(device.size)", x: 0, y: 48)
+//        context.fill(device.safeAreaBottom.description, x: 0, y: 64)
+//        context.fill(device.uiSizeClass.rawValue, x: 0, y: 80)
         
         context.restore()
     }
